@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 # Store user's options()
 old_options <- options()
 
@@ -14,18 +14,23 @@ knitr::opts_chunk$set(
 )
 options(width = 80)
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  # Install stable version from CRAN
+## ----eval=FALSE---------------------------------------------------------------
+#  # Option 1: Install stable version from CRAN
 #  install.packages("tlars")
 #  
-#  # Install development version from GitHub
+#  # Option 2: install developer version from GitHub
 #  install.packages("devtools")
 #  devtools::install_github("jasinmachkour/tlars")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
+#  # Option 1: Install stable version from CRAN
+#  install.packages("TRexSelector")
+#  
+#  # Option 2: install developer version from GitHub
+#  install.packages("devtools")
 #  devtools::install_github("jasinmachkour/TRexSelector")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  library(TRexSelector)
 #  help(package = "TRexSelector")
 #  ?trex
@@ -37,7 +42,7 @@ options(width = 80)
 #  ?TPP
 #  # etc.
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  citation("TRexSelector")
 
 ## -----------------------------------------------------------------------------
@@ -159,7 +164,7 @@ knitr::include_graphics("./figures/T-Rex_framework.png")
 ## ----EnlargedPredictorMatrix, echo=FALSE, fig.cap="Figure 2: The enlarged predictor matrix (predictor matrix with dummies).", out.width = '65%'----
 knitr::include_graphics("./figures/predictor_matrix_with_dummies.png")
 
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 # Reset user's options()
 options(old_options)
 

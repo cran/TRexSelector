@@ -1,11 +1,11 @@
 Package: TRexSelector
 Title: T-Rex Selector: High-Dimensional Variable Selection & FDR
         Control
-Version: 0.0.1
-Date: 2022-08-15
+Version: 1.0.0
+Date: 2024-02-23
 Description: Performs fast variable selection in high-dimensional settings while controlling the 
     false discovery rate (FDR) at a user-defined target level. The package is based on the paper 
-    Machkour, Muma, and Palomar (2021) <arXiv:2110.06048>.
+    Machkour, Muma, and Palomar (2022) <arXiv:2110.06048>.
 Authors@R: 
     c(
     person("Jasin", "Machkour", , "jasin.machkour@tu-darmstadt.de", role = c("aut", "cre")),
@@ -14,24 +14,26 @@ Authors@R:
     person("Michael", "Muma", , "michael.muma@tu-darmstadt.de", role = "aut")
     )
 Maintainer: Jasin Machkour <jasin.machkour@tu-darmstadt.de>
-URL: https://github.com/jasinmachkour/trex,
+URL: https://github.com/jasinmachkour/TRexSelector,
         https://arxiv.org/abs/2110.06048
-BugReports: https://github.com/jasinmachkour/trex/issues
+BugReports: https://github.com/jasinmachkour/TRexSelector/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.0
-Suggests: knitr, rmarkdown, ggplot2, patchwork, testthat (>= 3.0.0)
+RoxygenNote: 7.3.1
+biocViews:
+Suggests: knitr, rmarkdown, ggplot2, patchwork, WGCNA, fastcluster,
+        testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: MASS, stats, tlars, parallel, doParallel, foreach, doRNG,
-        methods, glmnet
+        methods, glmnet, boot
 Depends: R (>= 2.10)
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-08-15 20:36:06 UTC; phd
+Packaged: 2024-02-23 22:36:14 UTC; jasinmachkour
 Author: Jasin Machkour [aut, cre],
   Simon Tien [aut],
   Daniel P. Palomar [aut],
   Michael Muma [aut]
 Repository: CRAN
-Date/Publication: 2022-08-17 06:50:06 UTC
+Date/Publication: 2024-02-23 23:20:02 UTC
