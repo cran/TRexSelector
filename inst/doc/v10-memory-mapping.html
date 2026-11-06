@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Memory mapping: disk-backed designs</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">h1 { color: #336C68; }
+h2 { color: #6BB2AD; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Memory mapping: disk-backed designs</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#a-design-larger-than-the-memory" id="toc-a-design-larger-than-the-memory">A design larger than the
+memory</a></li>
+<li><a href="#creating-and-opening-a-mapped-matrix" id="toc-creating-and-opening-a-mapped-matrix">Creating and opening a
+mapped matrix</a></li>
+<li><a href="#streaming-a-design-into-the-file" id="toc-streaming-a-design-into-the-file">Streaming a design into the
+file</a></li>
+<li><a href="#selectors-on-a-mapped-design" id="toc-selectors-on-a-mapped-design">Selectors on a mapped
+design</a></li>
+<li><a href="#t-solvers-and-ml-methods" id="toc-t-solvers-and-ml-methods">T-solvers and ML methods</a></li>
+<li><a href="#when-it-pays" id="toc-when-it-pays">When it pays</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<div id="a-design-larger-than-the-memory" class="section level1">
+<h1>A design larger than the memory</h1>
+<p>A memory-mapped matrix lives in a file on disk, and the operating
+system pages the parts in use into memory. The C++ backend binds such a
+file exactly as it binds an R matrix, so every selector, every T-solver,
+the scalers, the low-memory regression engines and the clustering accept
+one. That is how a sparse regression problem with five million variables
+was solved on a laptop <span class="citation"><a href="#ref-scheidt2023bigtrex">[1]</a></span>. The file holds the matrix
+as raw doubles in column-major order, the layout of R and Eigen, without
+a header.</p>
+</div>
+<div id="creating-and-opening-a-mapped-matrix" class="section level1">
+<h1>Creating and opening a mapped matrix</h1>
+<p><code>mem_matrix_from()</code> writes an R matrix to a file and
+returns a handle, <code>mem_matrix()</code> opens an existing file with
+its dimensions and the access mode.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">5</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.bin&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>mm <span class="ot">&lt;-</span> <span class="fu">mem_matrix_from</span>(X, path)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">class</span>(mm)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;MemoryMappedMatrix&quot; &quot;mmap_matrix&quot;        &quot;externalptr&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="fu">dim</span>(mm)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; [1] 100 200</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">file.size</span>(path) <span class="sc">==</span> <span class="dv">8</span> <span class="sc">*</span> n <span class="sc">*</span> p</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>The handle supports the matrix operations one needs to inspect and to
+edit the file. Reading a block copies it into R memory, the backend
+never does.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">round</span>(mm[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], <span class="dv">3</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt;        [,1]   [,2]   [,3]</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; [1,] -0.841 -1.995 -0.114</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [2,]  1.384  1.135 -0.295</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">identical</span>(mm[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], X[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>])</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>mm[<span class="dv">1</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">42</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>mm[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; [1] 42</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>mm[<span class="dv">1</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> X[<span class="dv">1</span>, <span class="dv">1</span>]</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">as.matrix</span>(mm) <span class="sc">-</span> X))</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>ro <span class="ot">&lt;-</span> <span class="fu">mem_matrix</span>(path, <span class="at">rows =</span> n, <span class="at">cols =</span> p, <span class="at">mode =</span> <span class="st">&quot;readonly&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">tryCatch</span>(ro[<span class="dv">1</span>, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">0</span>, <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">cat</span>(<span class="st">&quot;error:&quot;</span>, <span class="fu">conditionMessage</span>(e), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; error: Cannot write to a read-only mmap_matrix.</span></span></code></pre></div>
+</div>
+<div id="streaming-a-design-into-the-file" class="section level1">
+<h1>Streaming a design into the file</h1>
+<p>A design that does not fit in memory is written column by column. The
+file is raw doubles in column-major order, so <code>writeBin()</code> of
+one column after another produces it.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>path2 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.bin&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">file</span>(path2, <span class="at">open =</span> <span class="st">&quot;wb&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_len</span>(p)) {</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1000</span> <span class="sc">+</span> j)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">writeBin</span>(<span class="fu">rnorm</span>(n), con)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">close</span>(con)</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>big <span class="ot">&lt;-</span> <span class="fu">mem_matrix</span>(path2, <span class="at">rows =</span> n, <span class="at">cols =</span> p, <span class="at">mode =</span> <span class="st">&quot;readwrite&quot;</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span> <span class="sc">+</span> <span class="dv">3</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">as.numeric</span>(big[, <span class="dv">3</span>]) <span class="sc">-</span> <span class="fu">rnorm</span>(n)))</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span></code></pre></div>
+</div>
+<div id="selectors-on-a-mapped-design" class="section level1">
+<h1>Selectors on a mapped design</h1>
+<p>The selectors take the handle where they take <code>X</code>. The
+file must be open in <code>&quot;readwrite&quot;</code> mode, because the selector
+centers and scales the design in place and restores it when
+<code>select()</code> returns (the page on working without data copies
+has the contract).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">1.5</span>, <span class="dv">4</span>), <span class="fu">rep</span>(<span class="dv">0</span>, p <span class="sc">-</span> <span class="dv">4</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>sel_mem <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">3</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                            <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>sel_mem<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>sel_map <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(mm, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">3</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>                            <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>sel_map<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="fu">identical</span>(sel_mem<span class="sc">$</span>selected_indices, sel_map<span class="sc">$</span>selected_indices)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">abs</span>(<span class="fu">as.matrix</span>(mm) <span class="sc">-</span> X))      <span class="co"># the file holds the original values again</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span></code></pre></div>
+<p>The same holds for <code>TRexDASelector</code>,
+<code>TRexGVSSelector</code>, <code>TRexScreeningSelector</code>,
+<code>TRexBiobankScreeningSelector</code>, <code>TRexSPCASelector</code>
+and <code>TRexTikhonovSelector</code>.
+<code>trex_control(use_memory_mapping = TRUE)</code> additionally keeps
+the dummy matrices of the random experiments in mapped files, for the
+case where <span class="math inline">\(K \cdot L \cdot p\)</span> dummy
+columns do not fit either.</p>
+</div>
+<div id="t-solvers-and-ml-methods" class="section level1">
+<h1>T-solvers and ML methods</h1>
+<p>A T-solver binds the mapped <code>X</code> as it binds a matrix, the
+scalers transform the file in place, the low-memory engines of the
+regressions read it in place, and the clustering accepts it as
+<code>data</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>s <span class="ot">&lt;-</span> TLARS_Solver<span class="sc">$</span><span class="fu">new</span>(mm, D, y)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>s<span class="sc">$</span><span class="fu">execute_step</span>(<span class="at">T_stop =</span> <span class="dv">2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>s<span class="sc">$</span><span class="fu">get_active_predictor_indices</span>()</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1]  2  4  3  1 30 14</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>s<span class="sc">$</span><span class="fu">restore</span>()</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>z <span class="ot">&lt;-</span> MLZScoreScaler<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">invisible</span>(z<span class="sc">$</span><span class="fu">fit_transform_inplace</span>(mm))</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(mm[, <span class="dv">1</span>]), <span class="dv">12</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">invisible</span>(z<span class="sc">$</span><span class="fu">inverse_transform_inplace</span>(mm))</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>en <span class="ot">&lt;-</span> MLElasticNet<span class="sc">$</span><span class="fu">new</span>(<span class="at">low_memory =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>en<span class="sc">$</span><span class="fu">fit</span>(mm, y, <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">n_lambda =</span> <span class="dv">20</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="fu">dim</span>(en<span class="sc">$</span><span class="fu">get_coef</span>())</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; [1] 200  20</span></span></code></pre></div>
+</div>
+<div id="when-it-pays" class="section level1">
+<h1>When it pays</h1>
+<p>A mapped design pays when the design does not fit into memory, when
+several solvers share one design and the working set should be loaded
+once, and when a design is produced by a streaming process and read
+afterwards. For a design that fits comfortably in memory an R matrix is
+faster, since no paging happens. Mapped files are never read into R’s
+heap by the backend, so the memory footprint of a run is the backend’s
+working data, see <code>get_memory_bytes()</code> on the T-solvers.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="ref-scheidt2023bigtrex" class="csl-entry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">F.
+Scheidt, J. Machkour, and M. Muma, <span>“Solving
+<span>FDR</span>-controlled sparse regression problems with five million
+variables on a laptop,”</span> in <em>Proc. IEEE 9th int. Workshop
+comput. Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp.
+116–120.</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

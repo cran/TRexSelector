@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Parallelism: who owns the cores</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">h1 { color: #336C68; }
+h2 { color: #6BB2AD; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Parallelism: who owns the cores</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#two-layers-of-work" id="toc-two-layers-of-work">Two layers
+of work</a></li>
+<li><a href="#the-default-thread-budget-of-the-package" id="toc-the-default-thread-budget-of-the-package">The default thread
+budget of the package</a></li>
+<li><a href="#the-solvers-passes" id="toc-the-solvers-passes">The
+solvers’ passes</a></li>
+<li><a href="#parallel-random-experiments" id="toc-parallel-random-experiments">Parallel random
+experiments</a></li>
+<li><a href="#determinism" id="toc-determinism">Determinism</a></li>
+<li><a href="#combining-with-your-own-parallel-loops" id="toc-combining-with-your-own-parallel-loops">Combining with your own
+parallel loops</a></li>
+<li><a href="#builds-without-openmp" id="toc-builds-without-openmp">Builds without OpenMP</a></li>
+<li><a href="#the-cran-rule" id="toc-the-cran-rule">The CRAN
+rule</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<div id="two-layers-of-work" class="section level1">
+<h1>Two layers of work</h1>
+<p>A T-Rex run has two layers that could use several cores. The outer
+layer is the <span class="math inline">\(K\)</span> random experiments,
+which are independent of each other and share the design. The inner
+layer is the work inside one T-solver: the passes over the design that
+refresh the correlations, the search for the next knot of the path, the
+standardization. The rule of the package is that one layer owns the
+cores at a time. Either the experiments run in parallel and every solver
+runs serially, or the experiments run in sequence and a solver may split
+its passes. Nested teams of threads are never formed.</p>
+<p>The default is serial. A selector runs its experiments one after the
+other, every solver runs on one thread, and a T-solver used on its own
+runs serially. Parallel work is opt-in through two options of
+<code>trex_control()</code>: <code>max_outer_threads</code> for the
+experiments and <code>max_inner_threads</code> for the solvers’
+passes.</p>
+</div>
+<div id="the-default-thread-budget-of-the-package" class="section level1">
+<h1>The default thread budget of the package</h1>
+<p>The package is single-threaded by default on every machine. Every
+parallel region of the backend runs on an explicit budget, and the
+methods without an option of their own (the scalers, the clustering, the
+ML regressions, <code>trex_normalize_design()</code>, the dummy and data
+generators) take the package’s default budget, which starts at 1.
+<code>trex_get_num_threads()</code> reads that default,
+<code>trex_set_num_threads()</code> sets it for the session and returns
+the previous value, and the <code>n_threads</code> argument of those
+methods overrides it per object. Inside a selector the same kernels take
+<code>max_inner_threads</code>. <code>trex_get_max_threads()</code>
+reports the threads OpenMP can run on this machine, an upper bound for a
+budget. In a build without OpenMP every setting is a no-op and the
+machine count is one.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">trex_get_num_threads</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">trex_get_max_threads</span>()</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; [1] 12</span></span></code></pre></div>
+<p>The selectors and the solvers do not read the default budget. Their
+budget comes from the control.</p>
+</div>
+<div id="the-solvers-passes" class="section level1">
+<h1>The solvers’ passes</h1>
+<p><code>trex_control(max_inner_threads = m)</code> gives every solver
+inside the random experiments a budget of <code>m</code> threads for its
+passes over the design (the correlation refreshes, the step-length
+search, the standardization). The default is 1. A pass is split only
+when it touches at least a million entries of the design, because the
+cost of forming a team of threads exceeds the gain below that, so small
+problems run serially whatever the budget says. The seeded generators
+(the dummies, the synthetic designs) count their work in the same unit
+with the measured cost of a random draw (about 80 entries) and of
+seeding an engine (up to 32,000), so they split from a few thousand
+entries. The budget is live when the experiments run in sequence. Inside
+parallel experiments the solvers stay serial. A T-solver used on its own
+takes the same budget through
+<code>tsolver_options(n_threads = )</code>, and
+<code>$set_num_threads()</code> changes it on a live solver.</p>
+</div>
+<div id="parallel-random-experiments" class="section level1">
+<h1>Parallel random experiments</h1>
+<p><code>trex_control(parallel_rnd_experiments = TRUE, max_outer_threads = m)</code>
+runs the random experiments on <code>m</code> threads (at most <span class="math inline">\(K\)</span>). Inside the parallel experiments every
+solver runs serially, so the number of threads in use is
+<code>max_outer_threads</code> and nothing more. Both options are whole
+numbers of at least 1. The lean L-loop strategies
+(<code>&quot;SEEDED&quot;</code>, <code>&quot;PERMUTATION&quot;</code>,
+<code>&quot;PERMUTATION_SEEDED&quot;</code>) run their experiments in sequence in
+every case and give the cores to the solvers.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">5</span>), <span class="fu">rep</span>(<span class="dv">0</span>, p <span class="sc">-</span> <span class="dv">5</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>serial <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>serial<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>parallel <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>                             <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>, <span class="at">parallel_rnd_experiments =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>                                                    <span class="at">max_outer_threads =</span> <span class="dv">2</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>parallel<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>budget <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">42</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>, <span class="at">max_inner_threads =</span> <span class="dv">2</span>))</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>budget<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">identical</span>(serial<span class="sc">$</span>selected_indices, parallel<span class="sc">$</span>selected_indices)</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="fu">identical</span>(serial<span class="sc">$</span>selected_indices, budget<span class="sc">$</span>selected_indices)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+</div>
+<div id="determinism" class="section level1">
+<h1>Determinism</h1>
+<p>A seeded selector derives one seed per random experiment from
+<code>seed</code> and the experiment index, so the dummies of experiment
+<span class="math inline">\(k\)</span> do not depend on which thread
+draws them or on how many threads there are. The selection of a seeded
+run is therefore the same with experiments in sequence and in parallel,
+and the same for any thread count of the inner passes. Every reduction
+inside the solvers is summed in a fixed order for the same reason.</p>
+</div>
+<div id="combining-with-your-own-parallel-loops" class="section level1">
+<h1>Combining with your own parallel loops</h1>
+<p>A Monte Carlo study usually parallelizes over trials. Then the trials
+own the cores, and the package should run serially inside every worker,
+which is the default. Two details matter.</p>
+<ul>
+<li>With <code>parallel::mclapply()</code> the workers are forks of the
+session and inherit its default budget. Keep it at one in the session,
+or set it to one in the workers with
+<code>trex_set_num_threads(1)</code>, so that the forks do not
+oversubscribe the machine.</li>
+<li>With <code>parallel::parLapply()</code> or the future framework the
+workers are separate R processes with the default budget of a fresh
+session, one thread. Load the package in the workers and keep the
+defaults.</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>trials <span class="ot">&lt;-</span> parallel<span class="sc">::</span><span class="fu">mclapply</span>(<span class="fu">seq_len</span>(<span class="dv">40</span>), <span class="cf">function</span>(mc) {</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">trex_set_num_threads</span>(<span class="dv">1</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="fu">set.seed</span>(mc)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  sel <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)   <span class="co"># seed = -1 per trial</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  sel<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="fu">trex_fdp</span>(sel<span class="sc">$</span>selected_indices, <span class="fu">which</span>(beta <span class="sc">!=</span> <span class="dv">0</span>))</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>}, <span class="at">mc.cores =</span> <span class="dv">4</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="fu">mean</span>(<span class="fu">unlist</span>(trials))</span></code></pre></div>
+</div>
+<div id="builds-without-openmp" class="section level1">
+<h1>Builds without OpenMP</h1>
+<p>On Linux and Windows R supplies the OpenMP flags. CRAN’s R for macOS
+has none, and the package then links the OpenMP runtime R ships with the
+header of Homebrew’s libomp, or compiles single-threaded when no header
+is found. <code>TREX_OPENMP=no</code> at installation forces the
+single-threaded build. A single-threaded build selects the same
+variables, it only runs the experiments and the passes in sequence.</p>
+</div>
+<div id="the-cran-rule" class="section level1">
+<h1>The CRAN rule</h1>
+<p>CRAN checks packages on at most two cores. The vignettes and the
+tests of this package follow the rule with the idiom of their setup
+chunk, which caps the count for the duration of the page and restores it
+at the end.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>old_threads <span class="ot">&lt;-</span> <span class="fu">trex_set_num_threads</span>(<span class="fu">min</span>(<span class="dv">2</span><span class="dt">L</span>, <span class="fu">trex_get_max_threads</span>()))</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># ... the work ...</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">trex_set_num_threads</span>(old_threads)</span></code></pre></div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>T-Rex GVS: grouped variable selection</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">h1 { color: #336C68; }
+h2 { color: #6BB2AD; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">T-Rex GVS: grouped variable selection</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#groups-of-correlated-variables" id="toc-groups-of-correlated-variables">Groups of correlated
+variables</a></li>
+<li><a href="#data-with-groups" id="toc-data-with-groups">Data with
+groups</a></li>
+<li><a href="#the-elastic-net-policy" id="toc-the-elastic-net-policy">The elastic net policy</a></li>
+<li><a href="#choosing-lambda_2" id="toc-choosing-lambda_2">Choosing
+lambda_2</a></li>
+<li><a href="#the-informed-elastic-net" id="toc-the-informed-elastic-net">The informed elastic net</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<div id="groups-of-correlated-variables" class="section level1">
+<h1>Groups of correlated variables</h1>
+<p>In genomics and finance, variables come in groups of highly
+correlated members that carry the same signal. The lasso picks one
+member of a group and drops the others, while the elastic net <span class="citation"><a href="#ref-zou2005elasticnet">[1]</a></span> spreads
+the coefficient over the group and lets the members enter together. The
+T-Rex selector for grouped variable selection (GVS) <span class="citation"><a href="#ref-machkour2022gvs">[2]</a></span> runs the
+terminating elastic net (T-ENET) inside the random experiments and draws
+its dummies in groups too, so that the dummies mirror the group
+structure of the null variables. The informed elastic net (IEN) <span class="citation"><a href="#ref-machkour2023ien">[3]</a></span> goes one
+step further and encodes the known or estimated groups in the penalty,
+so that the members of a group share a coefficient.</p>
+</div>
+<div id="data-with-groups" class="section level1">
+<h1>Data with groups</h1>
+<p>Twenty groups of five variables, each group driven by one latent
+factor. The first two groups are active.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>group_size <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>groups <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(p <span class="sc">/</span> group_size), <span class="at">each =</span> group_size)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>latent <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> <span class="fu">max</span>(groups)), n, <span class="fu">max</span>(groups))</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fl">0.9</span> <span class="sc">*</span> latent[, groups] <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.9</span><span class="sc">^</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>true_support <span class="ot">&lt;-</span> <span class="fu">which</span>(groups <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">numeric</span>(p)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>beta[true_support] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span></code></pre></div>
+</div>
+<div id="the-elastic-net-policy" class="section level1">
+<h1>The elastic net policy</h1>
+<p><code>gvs_type = &quot;EN&quot;</code> is the default. The selector clusters
+the variables by correlation (single linkage, cut at
+<code>corr_max</code>), draws its dummies per cluster and runs the
+T-ENET solver chosen by <code>en_solver</code> (<code>&quot;TENET&quot;</code> by
+default, <code>&quot;TENET_AUG&quot;</code> the row-augmented form and
+<code>&quot;TCDENET&quot;</code> the coordinate descent form, which select the
+same variables). The elastic-net penalty <span class="math inline">\(\lambda_2\)</span> is fixed here.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>gvs <span class="ot">&lt;-</span> TRexGVSSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">5</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                           <span class="at">gvs_control =</span> <span class="fu">trex_gvs_control</span>(<span class="at">gvs_type =</span> <span class="st">&quot;EN&quot;</span>, <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>gvs<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">sort</span>(gvs<span class="sc">$</span>selected_indices)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">trex_fdp</span>(gvs<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">trex_tpp</span>(gvs<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<p>The fields record the clustering and the penalty.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>gvs<span class="sc">$</span>gvs_type</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;EN&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>gvs<span class="sc">$</span>max_clusters</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; [1] 20</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>gvs<span class="sc">$</span>hc_method_used</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;single&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>gvs<span class="sc">$</span>lambda2_used</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">table</span>(gvs<span class="sc">$</span>groups)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 1 2 3 4 5 </span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; 5 5 5 5 5</span></span></code></pre></div>
+</div>
+<div id="choosing-lambda_2" class="section level1">
+<h1>Choosing lambda_2</h1>
+<p>A negative <code>lambda_2</code> (the default <code>-1</code>) lets
+the selector determine the penalty. <code>lambda2_method</code> names
+the rule. For the elastic net the default is <code>&quot;CV_1SE_CCD&quot;</code>,
+a ridge cross-validation by coordinate descent read with the
+one-standard-error rule, with <code>&quot;CV_MIN_CCD&quot;</code>,
+<code>&quot;CV_1SE_SVD&quot;</code> and <code>&quot;CV_MIN_SVD&quot;</code> as alternatives.
+The one-standard-error rule is preferred because the minimum rule tends
+to pin the penalty to the floor of the grid. <code>cv_n_folds</code>,
+<code>cv_n_lambda</code> and <code>cv_seed</code> control the
+cross-validation. <code>lambda2_cv_diagnostics</code> is the health
+record of the tuner: whether it ran, its seconds, and
+<code>n_profile_at_edge</code>, the number of <span class="math inline">\(\lambda_2\)</span> values whose profiled <span class="math inline">\(\lambda_1\)</span> optimum sat on a truncation
+edge of the path (0 is healthy).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cv <span class="ot">&lt;-</span> TRexGVSSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">5</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                          <span class="at">gvs_control =</span> <span class="fu">trex_gvs_control</span>(<span class="at">gvs_type =</span> <span class="st">&quot;EN&quot;</span>, <span class="at">cv_n_lambda =</span> <span class="dv">100</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                          <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>cv<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>cv<span class="sc">$</span>lambda2_used</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; [1] 100.2816</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">str</span>(cv<span class="sc">$</span>lambda2_cv_diagnostics)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; List of 12</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  $ ran                   : logi TRUE</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;  $ seconds               : num 0.0718</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;  $ n_profile_at_edge     : int 0</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;  $ support_cap           : int -1</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;  $ dfmax_ratio           : num 0</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;  $ low_dimensional       : logi FALSE</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;  $ grid_index            : int 83</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt;  $ grid_size             : int 100</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt;  $ at_grid_edge          : logi FALSE</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt;  $ profile_at_edge       : logi FALSE</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;  $ profile_at_support_cap: logi FALSE</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;  $ boundary_pick         : logi FALSE</span></span></code></pre></div>
+</div>
+<div id="the-informed-elastic-net" class="section level1">
+<h1>The informed elastic net</h1>
+<p><code>gvs_type = &quot;IEN&quot;</code> encodes the groups in the penalty. The
+groups come from <code>groups</code> in the control (1-based labels of
+length <span class="math inline">\(p\)</span>) or from the correlation
+clustering. The solver is set in <code>trex_control(solver = )</code>:
+<code>&quot;TIENET&quot;</code> (default, the native pathwise form),
+<code>&quot;TIENET_AUG&quot;</code> (row augmented) or <code>&quot;TCDIENET&quot;</code>
+(coordinate descent). The IEN rules of <code>lambda2_method</code>
+(<code>&quot;CV_1SE_IEN_CCD&quot;</code>, the default on this track,
+<code>&quot;CV_MIN_IEN_CCD&quot;</code>, <code>&quot;CV_1SE_TIK_SVD&quot;</code>,
+<code>&quot;CV_MIN_TIK_SVD&quot;</code>) consume the group structure and return
+<span class="math inline">\(\lambda_2\)</span> on the solver scale.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>ien <span class="ot">&lt;-</span> TRexGVSSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">5</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                           <span class="at">gvs_control =</span> <span class="fu">trex_gvs_control</span>(<span class="at">gvs_type =</span> <span class="st">&quot;IEN&quot;</span>, <span class="at">groups =</span> groups,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                                                          <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">solver =</span> <span class="st">&quot;TIENET&quot;</span>, <span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>ien<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="fu">sort</span>(ien<span class="sc">$</span>selected_indices)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1]  1  2  4  5  6  7 10</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">trex_fdp</span>(ien<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">trex_tpp</span>(ien<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span></code></pre></div>
+<p>With the groups known and the penalty informed, the active groups
+enter complete.</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="ref-zou2005elasticnet" class="csl-entry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">H.
+Zou and T. Hastie, <span>“Regularization and variable selection via the
+elastic net,”</span> <em>J. R. Stat. Soc. Ser. B Stat. Methodol.</em>,
+vol. 67, no. 2, pp. 301–320, 2005.</div>
+</div>
+<div id="ref-machkour2022gvs" class="csl-entry">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“False discovery rate
+control for grouped variable selection in high-dimensional linear models
+using the <span>T-Knock</span> filter,”</span> in <em>Proc. 30th eur.
+Signal process. Conf. (EUSIPCO)</em>, 2022, pp. 892–896.</div>
+</div>
+<div id="ref-machkour2023ien" class="csl-entry">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“The informed elastic net
+for fast grouped variable selection and <span>FDR</span> control in
+genomics research,”</span> in <em>Proc. IEEE 9th int. Workshop comput.
+Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp.
+466–470.</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

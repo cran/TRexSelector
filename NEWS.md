@@ -1,36 +1,25 @@
-## Changes in TRexSelector version 1.0.0 2024-02-23
+# TRexSelector 2.0.0
 
-* Package update (stable version):
+The package is rewritten as R bindings to the TRexSelector C++ library. The pure-R implementation of
+1.0.0 and its dependencies (tlars, MASS, glmnet, boot, parallel, doParallel, foreach, doRNG) are gone.
 
-  - Update supporting scientific papers.
-  - Add new methods and extensions of the T-Rex selector (e.g., dependency-aware T-Rex, Screen-T-Rex, etc.).
-  - Polish previous version.
+## Breaking changes
 
-## Changes in TRexSelector version 0.0.1 2022-08-15
+* The functional interface of 1.0.0 (`trex()`, `FDP()`, `TPP()`, `add_dummies_GVS()` and the other
+  helpers) is replaced by R6 classes and control lists:
+  `TRexSelector$new(X, y, tFDR, control = trex_control(...))$select()`, with `trex_fdp()` and
+  `trex_tpp()` as the metrics.
+* R 4.3 or newer and a C++20 compiler are required. OpenMP is optional.
 
-* First release:
+## New
 
-  - Polish pre-release version.
-
-## Changes in TRexSelector version 0.0.0.9000 2022-06-13
-
-* Initial pre-release version contains five major functions for executing the T-Rex selector (and/or executing its major building blocks separately):
-
-	- trex();
-	- random_experiments();
-	- lm_dummy();
-	- add_dummies(); and
-	- add_dummies_GVS().
-
-* It includes two functions for computing the false discovery proportion (FDP) and the true positive proportion (TPP):
-
-	- FDP(); and
-	- TPP().
-	
-* It includes three non-exported helper functions:
-
-  - fdp_hat();
-  - Phi_prime_fun(); and
-  - select_var_fun().
-	
-* Vignette illustrates how the TRexSelector package is used.
+* Selector variants as R6 classes: `TRexDASelector` (dependency-aware), `TRexGVSSelector` (grouped
+  variable selection with the elastic net and the informed elastic net), `TRexScreeningSelector` and
+  `TRexBiobankScreeningSelector` (screening), `TRexSPCASelector` (sparse PCA) and
+  `TRexTikhonovSelector` (a general Tikhonov penalty).
+* The twenty terminating solvers as classes of their own (`TLARS_Solver`, `TLASSO_Solver`, ...) with
+  `tsolver_options()`, working on the caller's matrices without copying.
+* Machine learning utilities: scalers, ridge and elastic-net regression with cross-validation, SVD,
+  PCA and hierarchical clustering (the `ML*` classes and `ml_*` functions).
+* Memory-mapped matrices (`mem_matrix()`, `mem_matrix_from()`), accepted everywhere a matrix is.
+* Twelve vignettes, and `citation("TRexSelector")` lists the package entry with the method papers.

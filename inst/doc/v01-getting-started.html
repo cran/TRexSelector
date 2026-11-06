@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting started with TRexSelector</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">h1 { color: #336C68; }
+h2 { color: #6BB2AD; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started with TRexSelector</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#what-the-package-does" id="toc-what-the-package-does">What
+the package does</a></li>
+<li><a href="#installation" id="toc-installation">Installation</a></li>
+<li><a href="#a-first-run" id="toc-a-first-run">A first run</a></li>
+<li><a href="#the-result-fields" id="toc-the-result-fields">The result
+fields</a></li>
+<li><a href="#choosing-a-selector-and-a-solver" id="toc-choosing-a-selector-and-a-solver">Choosing a selector and a
+solver</a></li>
+<li><a href="#map-of-the-pages" id="toc-map-of-the-pages">Map of the
+pages</a></li>
+<li><a href="#citing-the-package" id="toc-citing-the-package">Citing the
+package</a></li>
+<li><a href="#references" id="toc-references">References</a></li>
+</ul>
+</div>
+
+<div id="what-the-package-does" class="section level1">
+<h1>What the package does</h1>
+<p>The T-Rex selector (terminating-random experiments) selects variables
+in high-dimensional linear models while controlling the false discovery
+rate (FDR) at a target level chosen by the user, and it does so with a
+high true positive rate (TPR) <span class="citation"><a href="#ref-machkour2025trex">[1]</a></span>. It runs <span class="math inline">\(K\)</span> random experiments. In each experiment
+the design matrix <span class="math inline">\(\boldsymbol{X}\)</span> is
+enlarged by random dummy variables, a forward selection solver walks its
+path and stops as soon as <span class="math inline">\(T\)</span> dummies
+have entered the model, and the active sets of the <span class="math inline">\(K\)</span> experiments are fused by a vote. A
+calibration over the number of dummies and the stopping time guarantees
+the FDR level.</p>
+<p>The R package is the R interface to the TRexSelector C++ library. The
+same library drives the Python package and the C++ software development
+kit, so the three surfaces select the same variables on the same data.
+Version 2.0.0 replaces the pure-R implementation of the 1.x releases
+under the same package name.</p>
+<p>The package has four groups of tools.</p>
+<ul>
+<li><strong>T-Rex selectors.</strong> The core <code>TRexSelector</code>
+and its variants for dependent variables (<code>TRexDASelector</code>),
+grouped variables (<code>TRexGVSSelector</code>), fast screening
+(<code>TRexScreeningSelector</code>,
+<code>TRexBiobankScreeningSelector</code>), sparse principal component
+analysis (PCA) (<code>TRexSPCASelector</code>) and a general Tikhonov
+penalty (<code>TRexTikhonovSelector</code>).</li>
+<li><strong>T-solvers.</strong> The twenty terminating forward selection
+solvers the selectors run inside their random experiments, available as
+classes of their own.</li>
+<li><strong>Machine learning (ML) methods.</strong> Scalers, ridge and
+elastic-net regression with cross-validation, singular value
+decomposition (SVD), PCA and hierarchical clustering.</li>
+<li><strong>Memory-mapped matrices.</strong> Disk-backed designs
+accepted everywhere a matrix is, so a design larger than the memory of
+the machine can be processed.</li>
+</ul>
+</div>
+<div id="installation" class="section level1">
+<h1>Installation</h1>
+<p>The package compiles its C++ backend on installation, so a C++20
+compiler is required (GCC 10, Clang 12, Apple Clang 14, Rtools on
+Windows, or newer) together with R 4.3 or newer. First install the
+R-side prerequisites once.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;RcppEigen&quot;</span>, <span class="st">&quot;BH&quot;</span>, <span class="st">&quot;Rcereal&quot;</span>, <span class="st">&quot;R6&quot;</span>))</span></code></pre></div>
+<p>CRAN still carries the pure-R 1.x release, so until version 2.0.0 is
+accepted there, install it from GitHub. It lives in the
+<code>R/TRexSelector/</code> subdirectory of the repository.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;trexselector/TRexSelector&quot;</span>, <span class="at">subdir =</span> <span class="st">&quot;R/TRexSelector&quot;</span>)</span></code></pre></div>
+<p>OpenMP is optional. On Linux and Windows R supplies the OpenMP flags.
+CRAN’s R for macOS has none, so the configure script uses the
+<code>omp.h</code> header of Homebrew’s libomp
+(<code>brew install libomp</code>) together with the OpenMP runtime that
+R itself ships. Without a header the package compiles single-threaded
+and <code>trex_get_max_threads()</code> returns 1. The parallelism page
+explains what the threads are used for.</p>
+</div>
+<div id="a-first-run" class="section level1">
+<h1>A first run</h1>
+<p>The package ships a small Gaussian data set with <span class="math inline">\(n = 50\)</span> observations, <span class="math inline">\(p = 100\)</span> variables and three active
+variables.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">data</span>(Gauss_data)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>X <span class="ot">&lt;-</span> Gauss_data<span class="sc">$</span>X</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>y <span class="ot">&lt;-</span> Gauss_data<span class="sc">$</span>y</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>true_support <span class="ot">&lt;-</span> <span class="fu">which</span>(Gauss_data<span class="sc">$</span>support)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>true_support</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
+<p>The selectors are R6 classes. Construct one with <code>$new()</code>,
+run it with <code>$select()</code> and read the results from its fields.
+A fixed <code>seed</code> makes the dummy draws reproducible. The
+default <code>seed = -1</code> draws them from the hardware entropy
+source, which is the right choice for Monte Carlo studies, see the T-Rex
+selector page.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>sel <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>sel<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>sel<span class="sc">$</span>selected_indices</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
+<p>The two metrics of variable selection compare the selection with the
+true support. The false discovery proportion (FDP) is the share of false
+positives among the selected variables and the true positive proportion
+(TPP) is the share of the true support that was found. Their
+expectations are the FDR and the TPR.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">trex_fdp</span>(sel<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">trex_tpp</span>(sel<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+</div>
+<div id="the-result-fields" class="section level1">
+<h1>The result fields</h1>
+<p>Every selector exposes the calibration it arrived at.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sel<span class="sc">$</span>num_selected   <span class="co"># number of selected variables</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>sel<span class="sc">$</span>T_stop         <span class="co"># stopping time: dummies included when the T-loop stopped</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; [1] 6</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>sel<span class="sc">$</span>L              <span class="co"># calibrated dummy multiplier, the selector used L * p dummies</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; [1] 4</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>sel<span class="sc">$</span>v_thresh       <span class="co"># voting level the selection was read at</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>sel<span class="sc">$</span>K              <span class="co"># random experiments</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; [1] 20</span></span></code></pre></div>
+<p><code>fdp_hat_mat</code> holds the FDP estimate per stopping time
+(rows) and voting level (columns), <code>phi_mat</code> the relative
+occurrence of every variable over the <span class="math inline">\(K\)</span> experiments after each stopping time,
+and <code>voting_grid</code> the voting levels. The T-Rex selector page
+walks through them.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">dim</span>(sel<span class="sc">$</span>fdp_hat_mat)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; [1]  6 11</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">head</span>(sel<span class="sc">$</span>voting_grid)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.50 0.55 0.60 0.65 0.70 0.75</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">round</span>(sel<span class="sc">$</span>fdp_hat_mat[sel<span class="sc">$</span>T_stop, ], <span class="dv">3</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;  [1] 0.38 0.20 0.20 0.20 0.20 0.20 0.20 0.20 0.20 0.20 0.20</span></span></code></pre></div>
+</div>
+<div id="choosing-a-selector-and-a-solver" class="section level1">
+<h1>Choosing a selector and a solver</h1>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Situation</th>
+<th>Selector</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Independent or weakly dependent variables</td>
+<td><code>TRexSelector</code></td>
+<td>T-Rex selector</td>
+</tr>
+<tr class="even">
+<td>Strongly dependent variables (autoregressive, equi-correlated,
+clustered)</td>
+<td><code>TRexDASelector</code></td>
+<td>T-Rex+DA</td>
+</tr>
+<tr class="odd">
+<td>Groups of correlated variables that should enter together</td>
+<td><code>TRexGVSSelector</code></td>
+<td>T-Rex GVS</td>
+</tr>
+<tr class="even">
+<td>Very large <span class="math inline">\(p\)</span>, a fast first pass
+before the full selector</td>
+<td><code>TRexScreeningSelector</code></td>
+<td>Screening</td>
+</tr>
+<tr class="odd">
+<td>Many phenotypes against one genotype matrix</td>
+<td><code>TRexBiobankScreeningSelector</code></td>
+<td>Screening</td>
+</tr>
+<tr class="even">
+<td>Sparse principal components</td>
+<td><code>TRexSPCASelector</code></td>
+<td>T-Rex SPCA</td>
+</tr>
+<tr class="odd">
+<td>A structured penalty (smoothness, graph Laplacian, groups)</td>
+<td><code>TRexTikhonovSelector</code></td>
+<td>T-Rex Tikhonov</td>
+</tr>
+</tbody>
+</table>
+<p>The solver inside the random experiments is set in
+<code>trex_control(solver = )</code>. T-LARS (terminating least angle
+regression) is the default and the solver of the T-Rex paper. T-LASSO
+adds the lasso modification, T-ENET the elastic net, the orthogonal
+matching pursuit (OMP) family and the adaptive forward stepwise family
+are greedy and faster per step, and the coordinate descent (CD) family
+computes exact penalized minimizers at every dummy crossing. The
+T-solvers page describes the families, and every solver can be run on
+its own.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trex_control</span>(<span class="at">solver =</span> <span class="st">&quot;TLASSO&quot;</span>, <span class="at">K =</span> <span class="dv">10</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>sel2 <span class="ot">&lt;-</span> TRexSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">1234</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>, <span class="at">control =</span> ctrl)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>sel2<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>sel2<span class="sc">$</span>selected_indices</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
+</div>
+<div id="map-of-the-pages" class="section level1">
+<h1>Map of the pages</h1>
+<ol style="list-style-type: decimal">
+<li>Getting started (this page).</li>
+<li>The T-Rex selector: the framework, the control parameters and the
+result fields.</li>
+<li>T-Rex+DA: dependency-aware dummies.</li>
+<li>T-Rex GVS: grouped variable selection with the elastic net and the
+informed elastic net.</li>
+<li>Screening: Screen-T-Rex and the biobank screening.</li>
+<li>T-Rex SPCA: sparse PCA under FDR control.</li>
+<li>T-Rex Tikhonov: a general penalty matrix.</li>
+<li>The T-solvers: the twenty solvers and their options.</li>
+<li>The ML methods: scalers, regressions, decompositions and
+clustering.</li>
+<li>Memory mapping: disk-backed designs.</li>
+<li>Working without data copies: the in-place contract.</li>
+<li>Parallelism: who owns the cores.</li>
+</ol>
+</div>
+<div id="citing-the-package" class="section level1">
+<h1>Citing the package</h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">&quot;TRexSelector&quot;</span>)</span></code></pre></div>
+<p>The methods are published in <span class="citation"><a href="#ref-machkour2025trex">[1]</a></span> (T-Rex), <span class="citation"><a href="#ref-machkour2025datrex">[2]</a></span>
+(T-Rex+DA), <span class="citation"><a href="#ref-machkour2022gvs">[3]</a>, <a href="#ref-machkour2023ien">[4]</a></span> (T-Rex GVS), <span class="citation"><a href="#ref-machkour2023screen">[5]</a></span>
+(Screen-T-Rex), <span class="citation"><a href="#ref-machkour2024spca">[6]</a></span> (T-Rex SPCA), <span class="citation"><a href="#ref-scheidt2023bigtrex">[7]</a></span>
+(memory mapping) and <span class="citation"><a href="#ref-scheidt2026greedy">[8]</a></span> (the terminating greedy
+pursuits).</p>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="ref-machkour2025trex" class="csl-entry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“The terminating-random
+experiments selector: Fast high-dimensional variable selection with
+false discovery rate control,”</span> <em>Signal Process.</em>, vol.
+231, 2025, doi: <a href="https://doi.org/10.1016/j.sigpro.2025.109894">10.1016/j.sigpro.2025.109894</a>.</div>
+</div>
+<div id="ref-machkour2025datrex" class="csl-entry">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“High-dimensional false
+discovery rate control for dependent variables,”</span> <em>Signal
+Process.</em>, vol. 234, 2025, doi: <a href="https://doi.org/10.1016/j.sigpro.2025.109990">10.1016/j.sigpro.2025.109990</a>.</div>
+</div>
+<div id="ref-machkour2022gvs" class="csl-entry">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“False discovery rate
+control for grouped variable selection in high-dimensional linear models
+using the <span>T-Knock</span> filter,”</span> in <em>Proc. 30th eur.
+Signal process. Conf. (EUSIPCO)</em>, 2022, pp. 892–896.</div>
+</div>
+<div id="ref-machkour2023ien" class="csl-entry">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“The informed elastic net
+for fast grouped variable selection and <span>FDR</span> control in
+genomics research,”</span> in <em>Proc. IEEE 9th int. Workshop comput.
+Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp.
+466–470.</div>
+</div>
+<div id="ref-machkour2023screen" class="csl-entry">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“False discovery rate
+control for fast screening of large-scale genomics biobanks,”</span> in
+<em>Proc. 22nd IEEE statist. Signal process. Workshop (SSP)</em>, 2023,
+pp. 666–670.</div>
+</div>
+<div id="ref-machkour2024spca" class="csl-entry">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">J.
+Machkour, A. Breloy, M. Muma, D. P. Palomar, and F. Pascal,
+<span>“Sparse <span>PCA</span> with false discovery rate controlled
+variable selection,”</span> in <em>Proc. IEEE 49th int. Conf. Acoust.,
+speech, signal process. (ICASSP)</em>, 2024, pp. 9716–9720.</div>
+</div>
+<div id="ref-scheidt2023bigtrex" class="csl-entry">
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">F.
+Scheidt, J. Machkour, and M. Muma, <span>“Solving
+<span>FDR</span>-controlled sparse regression problems with five million
+variables on a laptop,”</span> in <em>Proc. IEEE 9th int. Workshop
+comput. Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp.
+116–120.</div>
+</div>
+<div id="ref-scheidt2026greedy" class="csl-entry">
+<div class="csl-left-margin">[8] </div><div class="csl-right-inline">F.
+Scheidt and M. Muma, <span>“Terminating greedy pursuits for
+high-dimensional false discovery rate control,”</span> in <em>Proc. Eur.
+Signal process. Conf. (EUSIPCO)</em>, 2026, pp. 2511–2515.</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
