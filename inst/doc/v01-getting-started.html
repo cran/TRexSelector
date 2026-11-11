@@ -168,8 +168,568 @@ margin-left: 2em;
 }
 </style>
 
-<style type="text/css">h1 { color: #336C68; }
-h2 { color: #6BB2AD; }
+<style type="text/css">
+body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 760px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 15px;
+line-height: 1.45;
+color: #24292e;
+}
+
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 6px 8px;
+width: 400px;
+border: 1px solid #d0d7de;
+border-radius: 5px;
+background-color: #f6f8fa;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+color: #336C68;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 18px;
+list-style: none;
+}
+
+#TOC a {
+color: #24292e;
+text-decoration: none;
+}
+#TOC a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+@media (min-width: 1100px) {
+body {
+margin-left: 300px;
+margin-right: auto;
+}
+#TOC {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: 240px;
+margin: 0;
+padding: 16px 12px;
+overflow-y: auto;
+border: none;
+border-right: 1px solid #d0d7de;
+border-radius: 0;
+}
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f8fa;
+border-left: 4px solid #d0d7de;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+
+pre, code {
+background-color: #f6f8fa;
+border-radius: 4px;
+color: #24292e;
+white-space: pre-wrap; 
+}
+pre {
+border: 1px solid #d0d7de;
+margin: 8px 0px 14px 0px;
+padding: 10px 12px;
+font-size: 13px;
+line-height: 1.4;
+}
+pre:not([class]) {
+background-color: #f6f8fa;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 87%;
+}
+p > code, li > code, td > code {
+padding: 2px 4px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #CCCCCC;
+border-radius: 3px;
+margin: 0 5px;
+}
+h1 {
+margin-top: 44px;
+font-size: 35px;
+line-height: 40px;
+}
+h1.title {
+margin-top: 0;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+margin-top: 32px;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+margin-top: 26px;
+padding-top: 10px;
+font-size: 120%;
+}
+
+div.section p,
+div.section li,
+body > p,
+body > blockquote p,
+body > ol > li,
+body > ul > li {
+text-align: justify;
+hyphens: auto;
+-webkit-hyphens: auto;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+body {
+padding-top: 48px;
+}
+.trex-topbar {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+z-index: 10;
+display: flex;
+align-items: center;
+min-height: 40px;
+padding: 0 16px;
+background: #2C3E50;
+color: #ecf0f1;
+font-size: 13px;
+}
+.trex-topbar .brand,
+.trex-topbar .brand:visited {
+font-weight: bold;
+font-size: 16px;
+color: #fff;
+margin-right: 12px;
+text-decoration: none;
+}
+.trex-topbar .brand:hover {
+color: #18BC9C;
+}
+.trex-topbar .sub {
+color: #bdc3c7;
+}
+.trex-topbar .where {
+margin-left: auto;
+color: #6BB2AD;
+font-weight: bold;
+}
+
+.trex-search {
+position: relative;
+margin: 0 0 0 24px;
+flex: 0 1 240px;
+min-width: 120px;
+}
+.trex-search input {
+width: 100%;
+box-sizing: border-box;
+padding: 4px 8px;
+border: 1px solid #4a5d70;
+border-radius: 4px;
+background: #3d5166;
+color: #fff;
+font-size: 13px;
+}
+.trex-search input::placeholder {
+color: #aab4be;
+}
+.trex-search input:focus {
+outline: none;
+border-color: #6BB2AD;
+}
+.trex-search-results {
+position: absolute;
+top: 30px;
+left: 0;
+width: 380px;
+max-width: 90vw;
+max-height: 60vh;
+overflow-y: auto;
+margin: 0;
+padding: 4px 0;
+list-style: none;
+background: #fff;
+border: 1px solid #d0d7de;
+border-radius: 4px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+z-index: 20;
+}
+.trex-search-results li {
+list-style: none;
+margin: 0;
+}
+.trex-search-results a {
+display: block;
+padding: 4px 10px;
+color: #24292e;
+text-decoration: none;
+font-size: 13px;
+line-height: 1.35;
+}
+.trex-search-results a:hover {
+background: #f6f8fa;
+color: #24292e;
+}
+.trex-search-results .page {
+display: inline-block;
+min-width: 62px;
+margin-right: 6px;
+color: #336C68;
+font-size: 11px;
+font-weight: bold;
+}
+.trex-search-results .none {
+padding: 4px 10px;
+color: #6a737d;
+font-size: 13px;
+}
+@media (min-width: 1100px) {
+#TOC {
+top: 40px;
+}
+}
+.trex-pane {
+margin-top: 14px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 13px;
+}
+.trex-pane::before {
+content: "User guide";
+display: block;
+font-weight: bold;
+font-size: 15px;
+margin: 0 0 4px 5px;
+color: #57606a;
+}
+.trex-pane ol {
+list-style: none;
+margin: 0;
+padding: 0 0 0 5px;
+}
+.trex-pane a.home {
+margin-left: 5px;
+}
+.trex-pane a.home,
+.trex-pane li a {
+display: block;
+padding: 2px 4px;
+color: #24292e;
+text-decoration: none;
+line-height: 18px;
+}
+.trex-pane a.home:hover,
+.trex-pane li a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+
+.trex-pane a.home.current,
+.trex-pane li.current a {
+font-weight: 600;
+color: #336C68;
+border-left: 4px solid #336C68;
+padding-left: 6px;
+}
+.trex-pane .n::after {
+content: ". ";
+}
+
+.trex-reference {
+margin-top: 14px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 13px;
+}
+.trex-reference::before {
+content: "Reference";
+display: block;
+font-weight: bold;
+font-size: 15px;
+margin: 0 0 4px 5px;
+color: #57606a;
+}
+#TOC .trex-reference ul {
+list-style: none;
+margin: 0;
+padding: 0 0 0 5px;
+}
+#TOC .trex-reference li a {
+display: block;
+padding: 2px 4px;
+color: #24292e;
+text-decoration: none;
+line-height: 18px;
+}
+#TOC .trex-reference li a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+
+.trex-pager {
+display: grid;
+grid-template-columns: 1fr auto 1fr;
+column-gap: 16px;
+align-items: center;
+margin-top: 36px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 14px;
+}
+.trex-pager a {
+color: #336C68;
+}
+.trex-pager .prev {
+grid-column: 1;
+}
+.trex-pager .where {
+grid-column: 2;
+color: #6a737d;
+font-size: 12px;
+}
+.trex-pager .next {
+grid-column: 3;
+text-align: right;
+}
+.trex-footer {
+margin-top: 28px;
+padding: 10px 0 4px;
+border-top: 1px solid #d0d7de;
+color: #6a737d;
+font-size: 12px;
+text-align: center;
+}
+#TOC a.active {
+font-weight: bold;
+color: #336C68;
+}
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+
+@media (prefers-color-scheme: dark) {
+:root {
+color-scheme: dark;
+}
+body {
+background-color: #0d1117;
+color: #d0d7de;
+}
+#TOC {
+background-color: #161b22;
+border-color: #30363d;
+}
+#TOC a, .trex-pane a.home, .trex-pane li a, #TOC .trex-reference li a {
+color: #d0d7de;
+}
+#TOC .toctitle, .trex-pane::before, .trex-reference::before {
+color: #8b949e;
+}
+.trex-pager a, #TOC a.active, .trex-pane a.home.current, .trex-pane li.current a {
+color: #6BB2AD;
+}
+.trex-pane a.home.current, .trex-pane li.current a {
+border-left-color: #6BB2AD;
+}
+#TOC a:hover, .trex-pane a.home:hover, .trex-pane li a:hover, #TOC .trex-reference li a:hover {
+color: #8cc8c4;
+}
+.trex-search-results {
+background: #161b22;
+border-color: #30363d;
+}
+.trex-search-results a {
+color: #d0d7de;
+}
+.trex-search-results a:hover {
+background: #1f2a29;
+color: #d0d7de;
+}
+.trex-pane, .trex-reference, .trex-pager, .trex-footer {
+border-top-color: #30363d;
+}
+.trex-pager .where, .trex-footer {
+color: #8b949e;
+}
+h2 {
+border-bottom-color: #21262d;
+}
+h3, h4 {
+border-bottom-color: #21262d;
+}
+h5, h6 {
+border-bottom-color: #30363d;
+}
+a {
+color: #58a6ff;
+}
+a:hover {
+color: #79c0ff;
+}
+a:visited {
+color: #bc8cff;
+}
+a:visited:hover {
+color: #d2a8ff;
+}
+table {
+border-color: #30363d;
+}
+table thead, table tr.even {
+background-color: #161b22;
+}
+blockquote {
+background-color: #161b22;
+border-left-color: #30363d;
+}
+hr {
+border-top-color: #484f58;
+}
+pre, code, pre:not([class]) {
+background-color: #161b22;
+color: #d0d7de;
+}
+pre {
+border-color: #30363d;
+}
+img {
+border-color: #30363d;
+}
+
+pre code span.kw, pre code span.cf, pre code span.im { color: #6ab825; font-weight: bold; }
+pre code span.dt { color: #6ab825; }
+pre code span.dv, pre code span.bn, pre code span.fl { color: #6fa8dc; }
+pre code span.st, pre code span.ch, pre code span.vs, pre code span.ss, pre code span.sc { color: #ed9d13; }
+pre code span.co, pre code span.do, pre code span.an, pre code span.cv, pre code span.in {
+color: #9a9a9a;
+font-style: italic;
+}
+pre code span.ot, pre code span.op, pre code span.at { color: #d0d7de; }
+pre code span.fu, pre code span.bu { color: #5e9bea; }
+pre code span.va, pre code span.cn { color: #79c0ff; }
+pre code span.al, pre code span.er { color: #ff6b6b; background-color: transparent; }
+}
 </style>
 
 
@@ -180,6 +740,332 @@ h2 { color: #6BB2AD; }
 <body>
 
 
+<!-- Shared header of the vignettes, included before the body of every page. The
+     page list below feeds the "User guide" block of the left table of contents, the
+     position in the top bar and the previous/next links at the end of the page.
+     A new vignette is one more list entry. The overview vignette, named after the
+     package, stands above the numbered pages and is linked from the brand. The
+     reference list feeds the "Reference" block under the pages. The search box of
+     the top bar reads the index between the two marker lines, which
+     tools/build_vignette_search_index.R writes from the page titles and headings. -->
+<header class="trex-topbar">
+  <a class="brand" href="TRexSelector.html">TRexSelector</a>
+  <span class="sub">R package guide</span>
+  <form class="trex-search" role="search" onsubmit="return false;">
+    <input type="search" placeholder="Search the guide" aria-label="Search the guide" autocomplete="off">
+    <ul class="trex-search-results" hidden></ul>
+  </form>
+  <span class="where"></span>
+</header>
+<a class="trex-pages-home" href="TRexSelector.html" hidden>Overview</a>
+<ol class="trex-pages-list" hidden>
+  <li><a href="v01-getting-started.html">Getting started</a></li>
+  <li><a href="v02-dimensionality.html">Dimensionality and FDR</a></li>
+  <li><a href="v03-trex-selector.html">The T-Rex selector</a></li>
+  <li><a href="v04-trex-da.html">T-Rex+DA</a></li>
+  <li><a href="v05-trex-gvs.html">T-Rex GVS</a></li>
+  <li><a href="v06-screening.html">Screen-T-Rex</a></li>
+  <li><a href="v07-trex-spca.html">T-Rex SPCA</a></li>
+  <li><a href="v08-trex-tikhonov.html">T-Rex Tikhonov</a></li>
+  <li><a href="v09-tsolvers.html">The T-solvers</a></li>
+  <li><a href="v10-ml-methods.html">The ML methods</a></li>
+  <li><a href="v11-memory-mapping.html">Memory mapping</a></li>
+  <li><a href="v12-no-copies.html">Without data copies</a></li>
+  <li><a href="v13-parallelism.html">Parallelism</a></li>
+</ol>
+<ul class="trex-reference-list" hidden>
+  <li><a href="https://CRAN.R-project.org/package=TRexSelector/TRexSelector.pdf">Reference manual (PDF)</a></li>
+  <li><a href="../html/00Index.html" data-installed-only>Help pages</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/tree/main/R/TRexSelector">Sources on GitHub</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/blob/main/OPENMP.md">OpenMP on your platform</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/blob/main/PUBLICATIONS.md">T-Rex publications</a></li>
+</ul>
+<nav class="trex-pane" aria-label="Vignettes"></nav>
+<!-- search index begin -->
+<script>
+var trexSearchIndex = [
+  {p:"TRexSelector.html",n:0,t:"The TRexSelector R package",h:[
+    ["User guide","user-guide"],
+    ["Reference","reference"],
+    ["Links","links"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v01-getting-started.html",n:1,t:"Getting started with TRexSelector",h:[
+    ["What the package does","what-the-package-does"],
+    ["Installation","installation"],
+    ["A first run","a-first-run"],
+    ["The result fields","the-result-fields"],
+    ["T-Rex variants of the library","t-rex-variants-of-the-library"],
+    ["Citing the package","citing-the-package"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v02-dimensionality.html",n:2,t:"Data dimensionality and FDR control",h:[
+    ["The variable selection problem","the-variable-selection-problem"],
+    ["FDR and TPR","fdr-and-tpr"],
+    ["Three regimes","three-regimes"],
+    ["Low dimensionality, $n \\geq p$","low-dimensionality-n-geq-p"],
+    ["High dimensionality, $p > n$","high-dimensionality-p-n"],
+    ["Highest dimensionality, $p \\gg n$","highest-dimensionality-p-gg-n"],
+    ["The regimes in one map","the-regimes-in-one-map"],
+    ["The T-Rex selector across the regimes","the-t-rex-selector-across-the-regimes"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v03-trex-selector.html",n:3,t:"The T-Rex selector",h:[
+    ["FDR and TPR","fdr-and-tpr"],
+    ["The framework","the-framework"],
+    ["Running the selector","running-the-selector"],
+    ["Seeds","seeds"],
+    ["The number of random experiments","the-number-of-random-experiments"],
+    ["Early stopping of the T-loop","early-stopping-of-the-t-loop"],
+    ["The result fields","the-result-fields"],
+    ["The L-loop strategies","the-l-loop-strategies"],
+    ["Dummy distributions","dummy-distributions"],
+    ["Scaling modes","scaling-modes"],
+    ["The design is used in place","the-design-is-used-in-place"],
+    ["FDR control in a small simulation","fdr-control-in-a-small-simulation"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v04-trex-da.html",n:4,t:"T-Rex+DA: dependency-aware dummies",h:[
+    ["Why dependent variables need their own dummies","why-dependent-variables-need-their-own-dummies"],
+    ["An autoregressive design","an-autoregressive-design"],
+    ["The dependency methods","the-dependency-methods"],
+    ["Prior groups","prior-groups"],
+    ["Greedy solvers under T-Rex+DA","greedy-solvers-under-t-rexda"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v05-trex-gvs.html",n:5,t:"T-Rex GVS: grouped variable selection",h:[
+    ["Groups of correlated variables","groups-of-correlated-variables"],
+    ["Data with groups","data-with-groups"],
+    ["The elastic net policy","the-elastic-net-policy"],
+    ["Choosing lambda_2","choosing-lambda_2"],
+    ["The informed elastic net","the-informed-elastic-net"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v06-screening.html",n:6,t:"Screening: Screen-T-Rex and the biobank screening",h:[
+    ["Screening before selecting","screening-before-selecting"],
+    ["Screen-T-Rex","screen-t-rex"],
+    ["A bootstrap confidence interval","a-bootstrap-confidence-interval"],
+    ["Dependent variables","dependent-variables"],
+    ["The biobank screening","the-biobank-screening"],
+    ["Large designs","large-designs"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v07-trex-spca.html",n:7,t:"T-Rex SPCA: sparse principal components under FDR control",h:[
+    ["Sparse loadings with a guarantee","sparse-loadings-with-a-guarantee"],
+    ["Data with two sparse factors","data-with-two-sparse-factors"],
+    ["Running the selector","running-the-selector"],
+    ["The control","the-control"],
+    ["Memory-mapped data","memory-mapped-data"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v08-trex-tikhonov.html",n:8,t:"T-Rex Tikhonov: a general penalty matrix",h:[
+    ["From the elastic net to a penalty matrix","from-the-elastic-net-to-a-penalty-matrix"],
+    ["A smooth coefficient profile","a-smooth-coefficient-profile"],
+    ["Running the selector","running-the-selector"],
+    ["Choosing lambda_2","choosing-lambda_2"],
+    ["Dummies for a structured penalty","dummies-for-a-structured-penalty"],
+    ["Group centering","group-centering"],
+    ["The solver","the-solver"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v09-tsolvers.html",n:9,t:"The T-solvers",h:[
+    ["Terminating forward selection","terminating-forward-selection"],
+    ["One terminated path","one-terminated-path"],
+    ["The path as a picture","the-path-as-a-picture"],
+    ["The options","the-options"],
+    ["Writers and readers","writers-and-readers"],
+    ["Saving and loading","saving-and-loading"],
+    ["Memory","memory"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v10-ml-methods.html",n:10,t:"The ML methods",h:[
+    ["The building blocks","the-building-blocks"],
+    ["Scalers","scalers"],
+    ["Ridge regression","ridge-regression"],
+    ["The elastic net","the-elastic-net"],
+    ["SVD and PCA","svd-and-pca"],
+    ["Hierarchical clustering","hierarchical-clustering"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v11-memory-mapping.html",n:11,t:"Memory mapping: disk-backed designs",h:[
+    ["A design larger than the memory","a-design-larger-than-the-memory"],
+    ["Creating and opening a mapped matrix","creating-and-opening-a-mapped-matrix"],
+    ["Streaming a design into the file","streaming-a-design-into-the-file"],
+    ["Selectors on a mapped design","selectors-on-a-mapped-design"],
+    ["T-solvers and ML methods","t-solvers-and-ml-methods"],
+    ["When it pays","when-it-pays"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v12-no-copies.html",n:12,t:"Working without data copies",h:[
+    ["The rule","the-rule"],
+    ["Pass double matrices","pass-double-matrices"],
+    ["Selectors: in place at construction, back at the end","selectors-in-place-at-construction-back-at-the-end"],
+    ["T-solvers: writers and readers","t-solvers-writers-and-readers"],
+    ["Loading a saved solver","loading-a-saved-solver"],
+    ["Mapped files are never read into memory","mapped-files-are-never-read-into-memory"],
+    ["The low-memory engines","the-low-memory-engines"],
+    ["Measuring the footprint","measuring-the-footprint"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v13-parallelism.html",n:13,t:"Parallelism: who owns the cores",h:[
+    ["Two layers of work","two-layers-of-work"],
+    ["The default thread budget of the package","the-default-thread-budget-of-the-package"],
+    ["The solvers' passes","the-solvers-passes"],
+    ["Parallel random experiments","parallel-random-experiments"],
+    ["Determinism","determinism"],
+    ["Combining with your own parallel loops","combining-with-your-own-parallel-loops"],
+    ["Builds without OpenMP","builds-without-openmp"],
+    ["The CRAN rule","the-cran-rule"],
+    ["Bibliography","bibliography"]
+  ]}
+];
+</script>
+<!-- search index end -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.documentElement.lang = "en"; // hyphenation of the justified text needs a language
+  var here = location.pathname.split("/").pop();
+  var items = Array.prototype.slice.call(document.querySelectorAll(".trex-pages-list li"));
+  var pages = items.map(function (li, i) {
+    var a = li.querySelector("a");
+    return { n: i + 1, href: a.getAttribute("href"), title: a.textContent };
+  });
+  var cur = -1;
+  pages.forEach(function (p, i) { if (p.href === here) cur = i; });
+  var homeEl = document.querySelector(".trex-pages-home");
+  var home = { href: homeEl.getAttribute("href"), title: homeEl.textContent };
+  var atHome = home.href === here;
+
+  /* the position in the top bar */
+  var where = document.querySelector(".trex-topbar .where");
+  if (where && cur >= 0) where.textContent = "Page " + (cur + 1) + " of " + pages.length;
+
+  /* the overview and the page list in the left table of contents */
+  var pane = document.querySelector(".trex-pane");
+  var toc = document.getElementById("TOC");
+  if (pane) {
+    var hl = document.createElement("a");
+    hl.className = "home" + (atHome ? " current" : "");
+    hl.href = home.href;
+    hl.textContent = home.title;
+    pane.appendChild(hl);
+    var ol = document.createElement("ol");
+    pages.forEach(function (p, i) {
+      var li = document.createElement("li");
+      if (i === cur) li.className = "current";
+      li.innerHTML = '<a href="' + p.href + '"><span class="n">' + p.n + '</span>' + p.title + '</a>';
+      ol.appendChild(li);
+    });
+    pane.appendChild(ol);
+
+    /* the reference block; the help pages only where an installed package serves them */
+    var onCran = /\/web\/packages\//.test(location.pathname);
+    var ref = document.createElement("div");
+    ref.className = "trex-reference";
+    var ul = document.createElement("ul");
+    Array.prototype.slice.call(document.querySelectorAll(".trex-reference-list li")).forEach(function (li) {
+      var a = li.querySelector("a");
+      if (onCran && a.hasAttribute("data-installed-only")) return;
+      var item = document.createElement("li");
+      item.innerHTML = '<a href="' + a.getAttribute("href") + '">' + a.textContent + '</a>';
+      ul.appendChild(item);
+    });
+    ref.appendChild(ul);
+    pane.appendChild(ref);
+    if (toc) toc.appendChild(pane);
+  }
+
+  /* the search box: page titles and headings of the index, matched as substrings */
+  var box = document.querySelector(".trex-search input");
+  var results = document.querySelector(".trex-search-results");
+  if (box && results && typeof trexSearchIndex !== "undefined") {
+    var addHit = function (href, page, text) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = href;
+      var tag = document.createElement("span");
+      tag.className = "page";
+      tag.textContent = page === 0 ? "Overview" : "Page " + page;
+      a.appendChild(tag);
+      a.appendChild(document.createTextNode(text));
+      li.appendChild(a);
+      results.appendChild(li);
+    };
+    var search = function () {
+      var q = box.value.trim().toLowerCase();
+      results.innerHTML = "";
+      if (q.length < 2) { results.hidden = true; return; }
+      var count = 0;
+      trexSearchIndex.forEach(function (pg) {
+        if (count < 40 && pg.t.toLowerCase().indexOf(q) >= 0) { addHit(pg.p, pg.n, pg.t); count++; }
+        pg.h.forEach(function (h) {
+          if (count < 40 && h[0].toLowerCase().indexOf(q) >= 0) { addHit(pg.p + "#" + h[1], pg.n, h[0]); count++; }
+        });
+      });
+      if (count === 0) {
+        var none = document.createElement("li");
+        none.className = "none";
+        none.textContent = "No heading matches";
+        results.appendChild(none);
+      }
+      results.hidden = false;
+    };
+    box.addEventListener("input", search);
+    box.addEventListener("focus", search);
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { box.value = ""; results.hidden = true; box.blur(); }
+    });
+    document.addEventListener("click", function (e) {
+      if (!box.parentNode.contains(e.target)) results.hidden = true;
+    });
+  }
+
+  /* previous and next at the end of the page; page 1 leads back to the overview,
+     the overview leads to page 1 */
+  var pager = document.createElement("nav");
+  pager.className = "trex-pager";
+  if (cur > 0) {
+    var prev = pages[cur - 1];
+    pager.innerHTML += '<a class="prev" href="' + prev.href + '">&larr; ' + prev.n + '. ' + prev.title + '</a>';
+  } else if (cur === 0) {
+    pager.innerHTML += '<a class="prev" href="' + home.href + '">&larr; ' + home.title + '</a>';
+  }
+  if (cur >= 0) pager.innerHTML += '<span class="where">' + (cur + 1) + ' / ' + pages.length + '</span>';
+  if (cur >= 0 && cur < pages.length - 1) {
+    var next = pages[cur + 1];
+    pager.innerHTML += '<a class="next" href="' + next.href + '">' + next.n + '. ' + next.title + ' &rarr;</a>';
+  } else if (atHome) {
+    var first = pages[0];
+    pager.innerHTML += '<a class="next" href="' + first.href + '">' + first.n + '. ' + first.title + ' &rarr;</a>';
+  }
+  document.body.appendChild(pager);
+
+  /* the copyright line under the pager */
+  var foot = document.createElement("footer");
+  foot.className = "trex-footer";
+  foot.textContent = "Copyright © 2026 Team T-Rex";
+  document.body.appendChild(foot);
+
+  /* the table of contents follows the scroll */
+  var links = Array.prototype.slice.call(document.querySelectorAll("#TOC a[href^='#']"));
+  var heads = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+  function follow() {
+    var active = -1;
+    heads.forEach(function (h, i) { if (h && h.getBoundingClientRect().top <= 90) active = i; });
+    links.forEach(function (a, i) { a.classList.toggle("active", i === active); });
+  }
+  window.addEventListener("scroll", follow);
+  follow();
+});
+</script>
 
 
 <h1 class="title toc-ignore">Getting started with TRexSelector</h1>
@@ -193,34 +1079,43 @@ the package does</a></li>
 <li><a href="#a-first-run" id="toc-a-first-run">A first run</a></li>
 <li><a href="#the-result-fields" id="toc-the-result-fields">The result
 fields</a></li>
-<li><a href="#choosing-a-selector-and-a-solver" id="toc-choosing-a-selector-and-a-solver">Choosing a selector and a
-solver</a></li>
-<li><a href="#map-of-the-pages" id="toc-map-of-the-pages">Map of the
-pages</a></li>
+<li><a href="#t-rex-variants-of-the-library" id="toc-t-rex-variants-of-the-library">T-Rex variants of the
+library</a></li>
 <li><a href="#citing-the-package" id="toc-citing-the-package">Citing the
 package</a></li>
-<li><a href="#references" id="toc-references">References</a></li>
+<li><a href="#bibliography" id="toc-bibliography">Bibliography</a></li>
 </ul>
 </div>
 
 <div id="what-the-package-does" class="section level1">
 <h1>What the package does</h1>
-<p>The T-Rex selector (terminating-random experiments) selects variables
-in high-dimensional linear models while controlling the false discovery
-rate (FDR) at a target level chosen by the user, and it does so with a
-high true positive rate (TPR) <span class="citation"><a href="#ref-machkour2025trex">[1]</a></span>. It runs <span class="math inline">\(K\)</span> random experiments. In each experiment
-the design matrix <span class="math inline">\(\boldsymbol{X}\)</span> is
-enlarged by random dummy variables, a forward selection solver walks its
-path and stops as soon as <span class="math inline">\(T\)</span> dummies
-have entered the model, and the active sets of the <span class="math inline">\(K\)</span> experiments are fused by a vote. A
-calibration over the number of dummies and the stopping time guarantees
-the FDR level.</p>
+<p>The Terminating-Random Experiments (T-Rex) selector selects variables
+while controlling the false discovery rate (FDR) at a target level
+chosen by the user, and it does so with a high true positive rate (TPR)
+<span class="citation"><a href="#ref-machkour2025trex">[1]</a></span>.
+It applies to low- and high-dimensional designs and is tailored to the
+high-dimensional problem. It takes a design matrix <span class="math inline">\(\boldsymbol{X}\)</span> with <span class="math inline">\(n\)</span> observations of <span class="math inline">\(p\)</span> variables, a response vector <span class="math inline">\(\boldsymbol{y}\)</span> and the target FDR, and
+runs <span class="math inline">\(K\)</span> random experiments in which
+the real variables compete with computer-generated dummy variables,
+random columns with finite mean and variance that act as flagged null
+variables. In every experiment the dummies are appended to the design, a
+forward selection solver walks its path and stops as soon as <span class="math inline">\(T\)</span> dummies have entered, and the share of
+experiments in which a variable was selected is its vote. Because a
+dummy enters as easily as a null variable, the included dummies give an
+estimate of the false discoveries, and a calibration over the number of
+dummies, the stopping time and the voting level selects as many
+variables as the FDR target allows, with a finite-sample guarantee that
+holds for a broad class of forward selection solvers. The scheme is not
+tied to the linear model and scales to millions of variables. The
+library currently covers the supervised linear model with a response
+vector and a design matrix.</p>
 <p>The R package is the R interface to the TRexSelector C++ library. The
 same library drives the Python package and the C++ software development
 kit, so the three surfaces select the same variables on the same data.
-Version 2.0.0 replaces the pure-R implementation of the 1.x releases
-under the same package name.</p>
-<p>The package has four groups of tools.</p>
+Since version 2.0.0 it replaces the pure-R implementation of the 1.x
+releases under the same package name [<a href="https://CRAN.R-project.org/src/contrib/Archive/TRexSelector/TRexSelector_1.0.0.tar.gz">version
+1.0.0</a>].</p>
+<p>The package currently has five groups of tools.</p>
 <ul>
 <li><strong>T-Rex selectors.</strong> The core <code>TRexSelector</code>
 and its variants for dependent variables (<code>TRexDASelector</code>),
@@ -235,30 +1130,47 @@ classes of their own.</li>
 <li><strong>Machine learning (ML) methods.</strong> Scalers, ridge and
 elastic-net regression with cross-validation, singular value
 decomposition (SVD), PCA and hierarchical clustering.</li>
-<li><strong>Memory-mapped matrices.</strong> Disk-backed designs
-accepted everywhere a matrix is, so a design larger than the memory of
-the machine can be processed.</li>
+<li><strong>Memory-mapped matrices.</strong> Disk-backed designs are
+accepted everywhere a matrix is accepted. The algorithms are agnostic to
+the data representation, so the library processes designs larger than
+the random-access memory (RAM) of the machine out of core.</li>
+<li><strong>Utilities.</strong> The selection metrics (false discovery
+proportion, true positive proportion, precision and recall), the
+normalizers, the dummy distributions, and the threading functions.</li>
 </ul>
 </div>
 <div id="installation" class="section level1">
 <h1>Installation</h1>
-<p>The package compiles its C++ backend on installation, so a C++20
+<p>The released package is on the Comprehensive R Archive Network (CRAN)
+[<a href="https://CRAN.R-project.org/package=TRexSelector">package
+page</a>]. Install it from an R session.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;TRexSelector&quot;</span>)</span></code></pre></div>
+<p>CRAN provides binaries for Windows and macOS. On Linux, and for every
+install from source, the package compiles its C++ backend, so a C++20
 compiler is required (GCC 10, Clang 12, Apple Clang 14, Rtools on
-Windows, or newer) together with R 4.3 or newer. First install the
-R-side prerequisites once.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;RcppEigen&quot;</span>, <span class="st">&quot;BH&quot;</span>, <span class="st">&quot;Rcereal&quot;</span>, <span class="st">&quot;R6&quot;</span>))</span></code></pre></div>
-<p>CRAN still carries the pure-R 1.x release, so until version 2.0.0 is
-accepted there, install it from GitHub. It lives in the
-<code>R/TRexSelector/</code> subdirectory of the repository.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)</span>
+Windows, or newer) together with R (&gt;= 4.3).</p>
+<p>The <code>main</code> branch of the repository carries the released
+sources, the version that is on CRAN, in the
+<code>R/TRexSelector/</code> subdirectory, and the development happens
+on the <code>dev_beyond</code> branch. Install the R-side prerequisites
+once, then the package from GitHub.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;RcppEigen&quot;</span>, <span class="st">&quot;BH&quot;</span>, <span class="st">&quot;Rcereal&quot;</span>, <span class="st">&quot;R6&quot;</span>, <span class="st">&quot;remotes&quot;</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;trexselector/TRexSelector&quot;</span>, <span class="at">subdir =</span> <span class="st">&quot;R/TRexSelector&quot;</span>)</span></code></pre></div>
-<p>OpenMP is optional. On Linux and Windows R supplies the OpenMP flags.
-CRAN’s R for macOS has none, so the configure script uses the
-<code>omp.h</code> header of Homebrew’s libomp
+<p>OpenMP is optional. The CRAN binary for Windows is built with it, and
+on Linux the package compiles with the OpenMP flags of R. CRAN’s R for
+macOS has none, so the macOS binary runs on one thread, while a build
+from source
+(<code>install.packages(&quot;TRexSelector&quot;, type = &quot;source&quot;)</code>) uses
+the <code>omp.h</code> header of Homebrew’s libomp
 (<code>brew install libomp</code>) together with the OpenMP runtime that
 R itself ships. Without a header the package compiles single-threaded
 and <code>trex_get_max_threads()</code> returns 1. The parallelism page
 explains what the threads are used for.</p>
+<p>The package builds on Rcpp <span class="citation"><a href="#ref-eddelbuettel2011rcpp">[2]</a></span> and RcppEigen <span class="citation"><a href="#ref-bates2013rcppeigen">[3]</a></span> for
+the bindings, on the Boost headers of BH <span class="citation"><a href="#ref-eddelbuettel2025bh">[4]</a></span> for the memory mapping, on
+the cereal headers of Rcereal <span class="citation"><a href="#ref-wu2024rcereal">[5]</a></span> for the serialization, and on
+R6 <span class="citation"><a href="#ref-chang2025r6">[6]</a></span> for
+its classes.</p>
 </div>
 <div id="a-first-run" class="section level1">
 <h1>A first run</h1>
@@ -315,8 +1227,8 @@ walks through them.</p>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">round</span>(sel<span class="sc">$</span>fdp_hat_mat[sel<span class="sc">$</span>T_stop, ], <span class="dv">3</span>)</span>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;  [1] 0.38 0.20 0.20 0.20 0.20 0.20 0.20 0.20 0.20 0.20 0.20</span></span></code></pre></div>
 </div>
-<div id="choosing-a-selector-and-a-solver" class="section level1">
-<h1>Choosing a selector and a solver</h1>
+<div id="t-rex-variants-of-the-library" class="section level1">
+<h1>T-Rex variants of the library</h1>
 <table>
 <colgroup>
 <col width="33%" />
@@ -332,7 +1244,7 @@ walks through them.</p>
 </thead>
 <tbody>
 <tr class="odd">
-<td>Independent or weakly dependent variables</td>
+<td>Independent or modestly dependent variables</td>
 <td><code>TRexSelector</code></td>
 <td>T-Rex selector</td>
 </tr>
@@ -351,12 +1263,12 @@ clustered)</td>
 <td>Very large <span class="math inline">\(p\)</span>, a fast first pass
 before the full selector</td>
 <td><code>TRexScreeningSelector</code></td>
-<td>Screening</td>
+<td>Screen-T-Rex</td>
 </tr>
 <tr class="odd">
 <td>Many phenotypes against one genotype matrix</td>
 <td><code>TRexBiobankScreeningSelector</code></td>
-<td>Screening</td>
+<td>Screen-T-Rex</td>
 </tr>
 <tr class="even">
 <td>Sparse principal components</td>
@@ -385,37 +1297,17 @@ its own.</p>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>sel2<span class="sc">$</span>selected_indices</span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span></code></pre></div>
 </div>
-<div id="map-of-the-pages" class="section level1">
-<h1>Map of the pages</h1>
-<ol style="list-style-type: decimal">
-<li>Getting started (this page).</li>
-<li>The T-Rex selector: the framework, the control parameters and the
-result fields.</li>
-<li>T-Rex+DA: dependency-aware dummies.</li>
-<li>T-Rex GVS: grouped variable selection with the elastic net and the
-informed elastic net.</li>
-<li>Screening: Screen-T-Rex and the biobank screening.</li>
-<li>T-Rex SPCA: sparse PCA under FDR control.</li>
-<li>T-Rex Tikhonov: a general penalty matrix.</li>
-<li>The T-solvers: the twenty solvers and their options.</li>
-<li>The ML methods: scalers, regressions, decompositions and
-clustering.</li>
-<li>Memory mapping: disk-backed designs.</li>
-<li>Working without data copies: the in-place contract.</li>
-<li>Parallelism: who owns the cores.</li>
-</ol>
-</div>
 <div id="citing-the-package" class="section level1">
 <h1>Citing the package</h1>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="st">&quot;TRexSelector&quot;</span>)</span></code></pre></div>
-<p>The methods are published in <span class="citation"><a href="#ref-machkour2025trex">[1]</a></span> (T-Rex), <span class="citation"><a href="#ref-machkour2025datrex">[2]</a></span>
-(T-Rex+DA), <span class="citation"><a href="#ref-machkour2022gvs">[3]</a>, <a href="#ref-machkour2023ien">[4]</a></span> (T-Rex GVS), <span class="citation"><a href="#ref-machkour2023screen">[5]</a></span>
-(Screen-T-Rex), <span class="citation"><a href="#ref-machkour2024spca">[6]</a></span> (T-Rex SPCA), <span class="citation"><a href="#ref-scheidt2023bigtrex">[7]</a></span>
-(memory mapping) and <span class="citation"><a href="#ref-scheidt2026greedy">[8]</a></span> (the terminating greedy
+<p>The methods are published in <span class="citation"><a href="#ref-machkour2025trex">[1]</a></span> (T-Rex), <span class="citation"><a href="#ref-machkour2025datrex">[7]</a></span>
+(T-Rex+DA), <span class="citation"><a href="#ref-machkour2022gvs">[8]</a>, <a href="#ref-machkour2023ien">[9]</a></span> (T-Rex GVS), <span class="citation"><a href="#ref-machkour2023screen">[10]</a></span>
+(Screen-T-Rex), <span class="citation"><a href="#ref-machkour2024spca">[11]</a></span> (T-Rex SPCA), <span class="citation"><a href="#ref-scheidt2023bigtrex">[12]</a></span>
+(memory mapping) and <span class="citation"><a href="#ref-scheidt2026greedy">[13]</a></span> (the terminating greedy
 pursuits).</p>
 </div>
-<div id="references" class="section level1 unnumbered">
-<h1 class="unnumbered">References</h1>
+<div id="bibliography" class="section level1 unnumbered">
+<h1 class="unnumbered">Bibliography</h1>
 <div id="refs" class="references csl-bib-body" entry-spacing="0">
 <div id="ref-machkour2025trex" class="csl-entry">
 <div class="csl-left-margin">[1] </div><div class="csl-right-inline">J.
@@ -424,51 +1316,78 @@ experiments selector: Fast high-dimensional variable selection with
 false discovery rate control,”</span> <em>Signal Process.</em>, vol.
 231, 2025, doi: <a href="https://doi.org/10.1016/j.sigpro.2025.109894">10.1016/j.sigpro.2025.109894</a>.</div>
 </div>
+<div id="ref-eddelbuettel2011rcpp" class="csl-entry">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">D.
+Eddelbuettel and R. François, <span>“<span>Rcpp</span>: Seamless
+<span>R</span> and <span>C++</span> integration,”</span> <em>J. Stat.
+Softw.</em>, vol. 40, no. 8, pp. 1–18, 2011, doi: <a href="https://doi.org/10.18637/jss.v040.i08">10.18637/jss.v040.i08</a>.</div>
+</div>
+<div id="ref-bates2013rcppeigen" class="csl-entry">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">D.
+Bates and D. Eddelbuettel, <span>“Fast and elegant numerical linear
+algebra using the <span>RcppEigen</span> package,”</span> <em>J. Stat.
+Softw.</em>, vol. 52, no. 5, pp. 1–24, 2013, doi: <a href="https://doi.org/10.18637/jss.v052.i05">10.18637/jss.v052.i05</a>.</div>
+</div>
+<div id="ref-eddelbuettel2025bh" class="csl-entry">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">D.
+Eddelbuettel, J. W. Emerson, and M. J. Kane, <em><span>BH</span>:
+<span>Boost</span> <span>C++</span> header files</em>. 2025. doi: <a href="https://doi.org/10.32614/CRAN.package.BH">10.32614/CRAN.package.BH</a>.</div>
+</div>
+<div id="ref-wu2024rcereal" class="csl-entry">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">W.
+Wu, <em><span>Rcereal</span>: Cereal headers for <span>R</span> and
+<span>C++</span> serialization</em>. 2024. doi: <a href="https://doi.org/10.32614/CRAN.package.Rcereal">10.32614/CRAN.package.Rcereal</a>.</div>
+</div>
+<div id="ref-chang2025r6" class="csl-entry">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">W.
+Chang, <em><span>R6</span>: Encapsulated classes with reference
+semantics</em>. 2025. doi: <a href="https://doi.org/10.32614/CRAN.package.R6">10.32614/CRAN.package.R6</a>.</div>
+</div>
 <div id="ref-machkour2025datrex" class="csl-entry">
-<div class="csl-left-margin">[2] </div><div class="csl-right-inline">J.
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">J.
 Machkour, M. Muma, and D. P. Palomar, <span>“High-dimensional false
 discovery rate control for dependent variables,”</span> <em>Signal
 Process.</em>, vol. 234, 2025, doi: <a href="https://doi.org/10.1016/j.sigpro.2025.109990">10.1016/j.sigpro.2025.109990</a>.</div>
 </div>
 <div id="ref-machkour2022gvs" class="csl-entry">
-<div class="csl-left-margin">[3] </div><div class="csl-right-inline">J.
+<div class="csl-left-margin">[8] </div><div class="csl-right-inline">J.
 Machkour, M. Muma, and D. P. Palomar, <span>“False discovery rate
 control for grouped variable selection in high-dimensional linear models
 using the <span>T-Knock</span> filter,”</span> in <em>Proc. 30th eur.
-Signal process. Conf. (EUSIPCO)</em>, 2022, pp. 892–896.</div>
+Signal process. Conf. (EUSIPCO)</em>, 2022, pp. 892–896. doi: <a href="https://doi.org/10.23919/EUSIPCO55093.2022.9909883">10.23919/EUSIPCO55093.2022.9909883</a>.</div>
 </div>
 <div id="ref-machkour2023ien" class="csl-entry">
-<div class="csl-left-margin">[4] </div><div class="csl-right-inline">J.
+<div class="csl-left-margin">[9] </div><div class="csl-right-inline">J.
 Machkour, M. Muma, and D. P. Palomar, <span>“The informed elastic net
 for fast grouped variable selection and <span>FDR</span> control in
 genomics research,”</span> in <em>Proc. IEEE 9th int. Workshop comput.
-Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp.
-466–470.</div>
+Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp. 466–470. doi:
+<a href="https://doi.org/10.1109/CAMSAP58249.2023.10403489">10.1109/CAMSAP58249.2023.10403489</a>.</div>
 </div>
 <div id="ref-machkour2023screen" class="csl-entry">
-<div class="csl-left-margin">[5] </div><div class="csl-right-inline">J.
+<div class="csl-left-margin">[10] </div><div class="csl-right-inline">J.
 Machkour, M. Muma, and D. P. Palomar, <span>“False discovery rate
 control for fast screening of large-scale genomics biobanks,”</span> in
 <em>Proc. 22nd IEEE statist. Signal process. Workshop (SSP)</em>, 2023,
-pp. 666–670.</div>
+pp. 666–670. doi: <a href="https://doi.org/10.1109/SSP53291.2023.10207957">10.1109/SSP53291.2023.10207957</a>.</div>
 </div>
 <div id="ref-machkour2024spca" class="csl-entry">
-<div class="csl-left-margin">[6] </div><div class="csl-right-inline">J.
+<div class="csl-left-margin">[11] </div><div class="csl-right-inline">J.
 Machkour, A. Breloy, M. Muma, D. P. Palomar, and F. Pascal,
 <span>“Sparse <span>PCA</span> with false discovery rate controlled
 variable selection,”</span> in <em>Proc. IEEE 49th int. Conf. Acoust.,
-speech, signal process. (ICASSP)</em>, 2024, pp. 9716–9720.</div>
+speech, signal process. (ICASSP)</em>, 2024, pp. 9716–9720. doi: <a href="https://doi.org/10.1109/ICASSP48485.2024.10448237">10.1109/ICASSP48485.2024.10448237</a>.</div>
 </div>
 <div id="ref-scheidt2023bigtrex" class="csl-entry">
-<div class="csl-left-margin">[7] </div><div class="csl-right-inline">F.
+<div class="csl-left-margin">[12] </div><div class="csl-right-inline">F.
 Scheidt, J. Machkour, and M. Muma, <span>“Solving
 <span>FDR</span>-controlled sparse regression problems with five million
 variables on a laptop,”</span> in <em>Proc. IEEE 9th int. Workshop
 comput. Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp.
-116–120.</div>
+116–120. doi: <a href="https://doi.org/10.1109/CAMSAP58249.2023.10403478">10.1109/CAMSAP58249.2023.10403478</a>.</div>
 </div>
 <div id="ref-scheidt2026greedy" class="csl-entry">
-<div class="csl-left-margin">[8] </div><div class="csl-right-inline">F.
+<div class="csl-left-margin">[13] </div><div class="csl-right-inline">F.
 Scheidt and M. Muma, <span>“Terminating greedy pursuits for
 high-dimensional false discovery rate control,”</span> in <em>Proc. Eur.
 Signal process. Conf. (EUSIPCO)</em>, 2026, pp. 2511–2515.</div>

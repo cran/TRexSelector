@@ -1,16 +1,16 @@
 ## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.align = "center",
-                      fig.width = 6, fig.height = 4)
+                      fig.width = 6, fig.height = 4, fig.retina = 2)
 options(width = 80)
 library(TRexSelector)
 # Vignettes build on at most two threads (the CRAN rule)
 old_threads <- trex_set_num_threads(min(2L, trex_get_max_threads()))
 
 ## ----eval = FALSE-------------------------------------------------------------
-# install.packages(c("Rcpp", "RcppEigen", "BH", "Rcereal", "R6"))
+# install.packages("TRexSelector")
 
 ## ----eval = FALSE-------------------------------------------------------------
-# install.packages("remotes")
+# install.packages(c("Rcpp", "RcppEigen", "BH", "Rcereal", "R6", "remotes"))
 # remotes::install_github("trexselector/TRexSelector", subdir = "R/TRexSelector")
 
 ## ----first-run----------------------------------------------------------------

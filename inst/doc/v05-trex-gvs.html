@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>T-Rex GVS: grouped variable selection</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">
+body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 760px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 15px;
+line-height: 1.45;
+color: #24292e;
+}
+
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 6px 8px;
+width: 400px;
+border: 1px solid #d0d7de;
+border-radius: 5px;
+background-color: #f6f8fa;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+color: #336C68;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 18px;
+list-style: none;
+}
+
+#TOC a {
+color: #24292e;
+text-decoration: none;
+}
+#TOC a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+@media (min-width: 1100px) {
+body {
+margin-left: 300px;
+margin-right: auto;
+}
+#TOC {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: 240px;
+margin: 0;
+padding: 16px 12px;
+overflow-y: auto;
+border: none;
+border-right: 1px solid #d0d7de;
+border-radius: 0;
+}
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f8fa;
+border-left: 4px solid #d0d7de;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+
+pre, code {
+background-color: #f6f8fa;
+border-radius: 4px;
+color: #24292e;
+white-space: pre-wrap; 
+}
+pre {
+border: 1px solid #d0d7de;
+margin: 8px 0px 14px 0px;
+padding: 10px 12px;
+font-size: 13px;
+line-height: 1.4;
+}
+pre:not([class]) {
+background-color: #f6f8fa;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 87%;
+}
+p > code, li > code, td > code {
+padding: 2px 4px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #CCCCCC;
+border-radius: 3px;
+margin: 0 5px;
+}
+h1 {
+margin-top: 44px;
+font-size: 35px;
+line-height: 40px;
+}
+h1.title {
+margin-top: 0;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+margin-top: 32px;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+margin-top: 26px;
+padding-top: 10px;
+font-size: 120%;
+}
+
+div.section p,
+div.section li,
+body > p,
+body > blockquote p,
+body > ol > li,
+body > ul > li {
+text-align: justify;
+hyphens: auto;
+-webkit-hyphens: auto;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+body {
+padding-top: 48px;
+}
+.trex-topbar {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+z-index: 10;
+display: flex;
+align-items: center;
+min-height: 40px;
+padding: 0 16px;
+background: #2C3E50;
+color: #ecf0f1;
+font-size: 13px;
+}
+.trex-topbar .brand,
+.trex-topbar .brand:visited {
+font-weight: bold;
+font-size: 16px;
+color: #fff;
+margin-right: 12px;
+text-decoration: none;
+}
+.trex-topbar .brand:hover {
+color: #18BC9C;
+}
+.trex-topbar .sub {
+color: #bdc3c7;
+}
+.trex-topbar .where {
+margin-left: auto;
+color: #6BB2AD;
+font-weight: bold;
+}
+
+.trex-search {
+position: relative;
+margin: 0 0 0 24px;
+flex: 0 1 240px;
+min-width: 120px;
+}
+.trex-search input {
+width: 100%;
+box-sizing: border-box;
+padding: 4px 8px;
+border: 1px solid #4a5d70;
+border-radius: 4px;
+background: #3d5166;
+color: #fff;
+font-size: 13px;
+}
+.trex-search input::placeholder {
+color: #aab4be;
+}
+.trex-search input:focus {
+outline: none;
+border-color: #6BB2AD;
+}
+.trex-search-results {
+position: absolute;
+top: 30px;
+left: 0;
+width: 380px;
+max-width: 90vw;
+max-height: 60vh;
+overflow-y: auto;
+margin: 0;
+padding: 4px 0;
+list-style: none;
+background: #fff;
+border: 1px solid #d0d7de;
+border-radius: 4px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+z-index: 20;
+}
+.trex-search-results li {
+list-style: none;
+margin: 0;
+}
+.trex-search-results a {
+display: block;
+padding: 4px 10px;
+color: #24292e;
+text-decoration: none;
+font-size: 13px;
+line-height: 1.35;
+}
+.trex-search-results a:hover {
+background: #f6f8fa;
+color: #24292e;
+}
+.trex-search-results .page {
+display: inline-block;
+min-width: 62px;
+margin-right: 6px;
+color: #336C68;
+font-size: 11px;
+font-weight: bold;
+}
+.trex-search-results .none {
+padding: 4px 10px;
+color: #6a737d;
+font-size: 13px;
+}
+@media (min-width: 1100px) {
+#TOC {
+top: 40px;
+}
+}
+.trex-pane {
+margin-top: 14px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 13px;
+}
+.trex-pane::before {
+content: "User guide";
+display: block;
+font-weight: bold;
+font-size: 15px;
+margin: 0 0 4px 5px;
+color: #57606a;
+}
+.trex-pane ol {
+list-style: none;
+margin: 0;
+padding: 0 0 0 5px;
+}
+.trex-pane a.home {
+margin-left: 5px;
+}
+.trex-pane a.home,
+.trex-pane li a {
+display: block;
+padding: 2px 4px;
+color: #24292e;
+text-decoration: none;
+line-height: 18px;
+}
+.trex-pane a.home:hover,
+.trex-pane li a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+
+.trex-pane a.home.current,
+.trex-pane li.current a {
+font-weight: 600;
+color: #336C68;
+border-left: 4px solid #336C68;
+padding-left: 6px;
+}
+.trex-pane .n::after {
+content: ". ";
+}
+
+.trex-reference {
+margin-top: 14px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 13px;
+}
+.trex-reference::before {
+content: "Reference";
+display: block;
+font-weight: bold;
+font-size: 15px;
+margin: 0 0 4px 5px;
+color: #57606a;
+}
+#TOC .trex-reference ul {
+list-style: none;
+margin: 0;
+padding: 0 0 0 5px;
+}
+#TOC .trex-reference li a {
+display: block;
+padding: 2px 4px;
+color: #24292e;
+text-decoration: none;
+line-height: 18px;
+}
+#TOC .trex-reference li a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+
+.trex-pager {
+display: grid;
+grid-template-columns: 1fr auto 1fr;
+column-gap: 16px;
+align-items: center;
+margin-top: 36px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 14px;
+}
+.trex-pager a {
+color: #336C68;
+}
+.trex-pager .prev {
+grid-column: 1;
+}
+.trex-pager .where {
+grid-column: 2;
+color: #6a737d;
+font-size: 12px;
+}
+.trex-pager .next {
+grid-column: 3;
+text-align: right;
+}
+.trex-footer {
+margin-top: 28px;
+padding: 10px 0 4px;
+border-top: 1px solid #d0d7de;
+color: #6a737d;
+font-size: 12px;
+text-align: center;
+}
+#TOC a.active {
+font-weight: bold;
+color: #336C68;
+}
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+
+@media (prefers-color-scheme: dark) {
+:root {
+color-scheme: dark;
+}
+body {
+background-color: #0d1117;
+color: #d0d7de;
+}
+#TOC {
+background-color: #161b22;
+border-color: #30363d;
+}
+#TOC a, .trex-pane a.home, .trex-pane li a, #TOC .trex-reference li a {
+color: #d0d7de;
+}
+#TOC .toctitle, .trex-pane::before, .trex-reference::before {
+color: #8b949e;
+}
+.trex-pager a, #TOC a.active, .trex-pane a.home.current, .trex-pane li.current a {
+color: #6BB2AD;
+}
+.trex-pane a.home.current, .trex-pane li.current a {
+border-left-color: #6BB2AD;
+}
+#TOC a:hover, .trex-pane a.home:hover, .trex-pane li a:hover, #TOC .trex-reference li a:hover {
+color: #8cc8c4;
+}
+.trex-search-results {
+background: #161b22;
+border-color: #30363d;
+}
+.trex-search-results a {
+color: #d0d7de;
+}
+.trex-search-results a:hover {
+background: #1f2a29;
+color: #d0d7de;
+}
+.trex-pane, .trex-reference, .trex-pager, .trex-footer {
+border-top-color: #30363d;
+}
+.trex-pager .where, .trex-footer {
+color: #8b949e;
+}
+h2 {
+border-bottom-color: #21262d;
+}
+h3, h4 {
+border-bottom-color: #21262d;
+}
+h5, h6 {
+border-bottom-color: #30363d;
+}
+a {
+color: #58a6ff;
+}
+a:hover {
+color: #79c0ff;
+}
+a:visited {
+color: #bc8cff;
+}
+a:visited:hover {
+color: #d2a8ff;
+}
+table {
+border-color: #30363d;
+}
+table thead, table tr.even {
+background-color: #161b22;
+}
+blockquote {
+background-color: #161b22;
+border-left-color: #30363d;
+}
+hr {
+border-top-color: #484f58;
+}
+pre, code, pre:not([class]) {
+background-color: #161b22;
+color: #d0d7de;
+}
+pre {
+border-color: #30363d;
+}
+img {
+border-color: #30363d;
+}
+
+pre code span.kw, pre code span.cf, pre code span.im { color: #6ab825; font-weight: bold; }
+pre code span.dt { color: #6ab825; }
+pre code span.dv, pre code span.bn, pre code span.fl { color: #6fa8dc; }
+pre code span.st, pre code span.ch, pre code span.vs, pre code span.ss, pre code span.sc { color: #ed9d13; }
+pre code span.co, pre code span.do, pre code span.an, pre code span.cv, pre code span.in {
+color: #9a9a9a;
+font-style: italic;
+}
+pre code span.ot, pre code span.op, pre code span.at { color: #d0d7de; }
+pre code span.fu, pre code span.bu { color: #5e9bea; }
+pre code span.va, pre code span.cn { color: #79c0ff; }
+pre code span.al, pre code span.er { color: #ff6b6b; background-color: transparent; }
+}
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<!-- Shared header of the vignettes, included before the body of every page. The
+     page list below feeds the "User guide" block of the left table of contents, the
+     position in the top bar and the previous/next links at the end of the page.
+     A new vignette is one more list entry. The overview vignette, named after the
+     package, stands above the numbered pages and is linked from the brand. The
+     reference list feeds the "Reference" block under the pages. The search box of
+     the top bar reads the index between the two marker lines, which
+     tools/build_vignette_search_index.R writes from the page titles and headings. -->
+<header class="trex-topbar">
+  <a class="brand" href="TRexSelector.html">TRexSelector</a>
+  <span class="sub">R package guide</span>
+  <form class="trex-search" role="search" onsubmit="return false;">
+    <input type="search" placeholder="Search the guide" aria-label="Search the guide" autocomplete="off">
+    <ul class="trex-search-results" hidden></ul>
+  </form>
+  <span class="where"></span>
+</header>
+<a class="trex-pages-home" href="TRexSelector.html" hidden>Overview</a>
+<ol class="trex-pages-list" hidden>
+  <li><a href="v01-getting-started.html">Getting started</a></li>
+  <li><a href="v02-dimensionality.html">Dimensionality and FDR</a></li>
+  <li><a href="v03-trex-selector.html">The T-Rex selector</a></li>
+  <li><a href="v04-trex-da.html">T-Rex+DA</a></li>
+  <li><a href="v05-trex-gvs.html">T-Rex GVS</a></li>
+  <li><a href="v06-screening.html">Screen-T-Rex</a></li>
+  <li><a href="v07-trex-spca.html">T-Rex SPCA</a></li>
+  <li><a href="v08-trex-tikhonov.html">T-Rex Tikhonov</a></li>
+  <li><a href="v09-tsolvers.html">The T-solvers</a></li>
+  <li><a href="v10-ml-methods.html">The ML methods</a></li>
+  <li><a href="v11-memory-mapping.html">Memory mapping</a></li>
+  <li><a href="v12-no-copies.html">Without data copies</a></li>
+  <li><a href="v13-parallelism.html">Parallelism</a></li>
+</ol>
+<ul class="trex-reference-list" hidden>
+  <li><a href="https://CRAN.R-project.org/package=TRexSelector/TRexSelector.pdf">Reference manual (PDF)</a></li>
+  <li><a href="../html/00Index.html" data-installed-only>Help pages</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/tree/main/R/TRexSelector">Sources on GitHub</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/blob/main/OPENMP.md">OpenMP on your platform</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/blob/main/PUBLICATIONS.md">T-Rex publications</a></li>
+</ul>
+<nav class="trex-pane" aria-label="Vignettes"></nav>
+<!-- search index begin -->
+<script>
+var trexSearchIndex = [
+  {p:"TRexSelector.html",n:0,t:"The TRexSelector R package",h:[
+    ["User guide","user-guide"],
+    ["Reference","reference"],
+    ["Links","links"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v01-getting-started.html",n:1,t:"Getting started with TRexSelector",h:[
+    ["What the package does","what-the-package-does"],
+    ["Installation","installation"],
+    ["A first run","a-first-run"],
+    ["The result fields","the-result-fields"],
+    ["T-Rex variants of the library","t-rex-variants-of-the-library"],
+    ["Citing the package","citing-the-package"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v02-dimensionality.html",n:2,t:"Data dimensionality and FDR control",h:[
+    ["The variable selection problem","the-variable-selection-problem"],
+    ["FDR and TPR","fdr-and-tpr"],
+    ["Three regimes","three-regimes"],
+    ["Low dimensionality, $n \\geq p$","low-dimensionality-n-geq-p"],
+    ["High dimensionality, $p > n$","high-dimensionality-p-n"],
+    ["Highest dimensionality, $p \\gg n$","highest-dimensionality-p-gg-n"],
+    ["The regimes in one map","the-regimes-in-one-map"],
+    ["The T-Rex selector across the regimes","the-t-rex-selector-across-the-regimes"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v03-trex-selector.html",n:3,t:"The T-Rex selector",h:[
+    ["FDR and TPR","fdr-and-tpr"],
+    ["The framework","the-framework"],
+    ["Running the selector","running-the-selector"],
+    ["Seeds","seeds"],
+    ["The number of random experiments","the-number-of-random-experiments"],
+    ["Early stopping of the T-loop","early-stopping-of-the-t-loop"],
+    ["The result fields","the-result-fields"],
+    ["The L-loop strategies","the-l-loop-strategies"],
+    ["Dummy distributions","dummy-distributions"],
+    ["Scaling modes","scaling-modes"],
+    ["The design is used in place","the-design-is-used-in-place"],
+    ["FDR control in a small simulation","fdr-control-in-a-small-simulation"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v04-trex-da.html",n:4,t:"T-Rex+DA: dependency-aware dummies",h:[
+    ["Why dependent variables need their own dummies","why-dependent-variables-need-their-own-dummies"],
+    ["An autoregressive design","an-autoregressive-design"],
+    ["The dependency methods","the-dependency-methods"],
+    ["Prior groups","prior-groups"],
+    ["Greedy solvers under T-Rex+DA","greedy-solvers-under-t-rexda"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v05-trex-gvs.html",n:5,t:"T-Rex GVS: grouped variable selection",h:[
+    ["Groups of correlated variables","groups-of-correlated-variables"],
+    ["Data with groups","data-with-groups"],
+    ["The elastic net policy","the-elastic-net-policy"],
+    ["Choosing lambda_2","choosing-lambda_2"],
+    ["The informed elastic net","the-informed-elastic-net"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v06-screening.html",n:6,t:"Screening: Screen-T-Rex and the biobank screening",h:[
+    ["Screening before selecting","screening-before-selecting"],
+    ["Screen-T-Rex","screen-t-rex"],
+    ["A bootstrap confidence interval","a-bootstrap-confidence-interval"],
+    ["Dependent variables","dependent-variables"],
+    ["The biobank screening","the-biobank-screening"],
+    ["Large designs","large-designs"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v07-trex-spca.html",n:7,t:"T-Rex SPCA: sparse principal components under FDR control",h:[
+    ["Sparse loadings with a guarantee","sparse-loadings-with-a-guarantee"],
+    ["Data with two sparse factors","data-with-two-sparse-factors"],
+    ["Running the selector","running-the-selector"],
+    ["The control","the-control"],
+    ["Memory-mapped data","memory-mapped-data"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v08-trex-tikhonov.html",n:8,t:"T-Rex Tikhonov: a general penalty matrix",h:[
+    ["From the elastic net to a penalty matrix","from-the-elastic-net-to-a-penalty-matrix"],
+    ["A smooth coefficient profile","a-smooth-coefficient-profile"],
+    ["Running the selector","running-the-selector"],
+    ["Choosing lambda_2","choosing-lambda_2"],
+    ["Dummies for a structured penalty","dummies-for-a-structured-penalty"],
+    ["Group centering","group-centering"],
+    ["The solver","the-solver"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v09-tsolvers.html",n:9,t:"The T-solvers",h:[
+    ["Terminating forward selection","terminating-forward-selection"],
+    ["One terminated path","one-terminated-path"],
+    ["The path as a picture","the-path-as-a-picture"],
+    ["The options","the-options"],
+    ["Writers and readers","writers-and-readers"],
+    ["Saving and loading","saving-and-loading"],
+    ["Memory","memory"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v10-ml-methods.html",n:10,t:"The ML methods",h:[
+    ["The building blocks","the-building-blocks"],
+    ["Scalers","scalers"],
+    ["Ridge regression","ridge-regression"],
+    ["The elastic net","the-elastic-net"],
+    ["SVD and PCA","svd-and-pca"],
+    ["Hierarchical clustering","hierarchical-clustering"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v11-memory-mapping.html",n:11,t:"Memory mapping: disk-backed designs",h:[
+    ["A design larger than the memory","a-design-larger-than-the-memory"],
+    ["Creating and opening a mapped matrix","creating-and-opening-a-mapped-matrix"],
+    ["Streaming a design into the file","streaming-a-design-into-the-file"],
+    ["Selectors on a mapped design","selectors-on-a-mapped-design"],
+    ["T-solvers and ML methods","t-solvers-and-ml-methods"],
+    ["When it pays","when-it-pays"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v12-no-copies.html",n:12,t:"Working without data copies",h:[
+    ["The rule","the-rule"],
+    ["Pass double matrices","pass-double-matrices"],
+    ["Selectors: in place at construction, back at the end","selectors-in-place-at-construction-back-at-the-end"],
+    ["T-solvers: writers and readers","t-solvers-writers-and-readers"],
+    ["Loading a saved solver","loading-a-saved-solver"],
+    ["Mapped files are never read into memory","mapped-files-are-never-read-into-memory"],
+    ["The low-memory engines","the-low-memory-engines"],
+    ["Measuring the footprint","measuring-the-footprint"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v13-parallelism.html",n:13,t:"Parallelism: who owns the cores",h:[
+    ["Two layers of work","two-layers-of-work"],
+    ["The default thread budget of the package","the-default-thread-budget-of-the-package"],
+    ["The solvers' passes","the-solvers-passes"],
+    ["Parallel random experiments","parallel-random-experiments"],
+    ["Determinism","determinism"],
+    ["Combining with your own parallel loops","combining-with-your-own-parallel-loops"],
+    ["Builds without OpenMP","builds-without-openmp"],
+    ["The CRAN rule","the-cran-rule"],
+    ["Bibliography","bibliography"]
+  ]}
+];
+</script>
+<!-- search index end -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.documentElement.lang = "en"; // hyphenation of the justified text needs a language
+  var here = location.pathname.split("/").pop();
+  var items = Array.prototype.slice.call(document.querySelectorAll(".trex-pages-list li"));
+  var pages = items.map(function (li, i) {
+    var a = li.querySelector("a");
+    return { n: i + 1, href: a.getAttribute("href"), title: a.textContent };
+  });
+  var cur = -1;
+  pages.forEach(function (p, i) { if (p.href === here) cur = i; });
+  var homeEl = document.querySelector(".trex-pages-home");
+  var home = { href: homeEl.getAttribute("href"), title: homeEl.textContent };
+  var atHome = home.href === here;
+
+  /* the position in the top bar */
+  var where = document.querySelector(".trex-topbar .where");
+  if (where && cur >= 0) where.textContent = "Page " + (cur + 1) + " of " + pages.length;
+
+  /* the overview and the page list in the left table of contents */
+  var pane = document.querySelector(".trex-pane");
+  var toc = document.getElementById("TOC");
+  if (pane) {
+    var hl = document.createElement("a");
+    hl.className = "home" + (atHome ? " current" : "");
+    hl.href = home.href;
+    hl.textContent = home.title;
+    pane.appendChild(hl);
+    var ol = document.createElement("ol");
+    pages.forEach(function (p, i) {
+      var li = document.createElement("li");
+      if (i === cur) li.className = "current";
+      li.innerHTML = '<a href="' + p.href + '"><span class="n">' + p.n + '</span>' + p.title + '</a>';
+      ol.appendChild(li);
+    });
+    pane.appendChild(ol);
+
+    /* the reference block; the help pages only where an installed package serves them */
+    var onCran = /\/web\/packages\//.test(location.pathname);
+    var ref = document.createElement("div");
+    ref.className = "trex-reference";
+    var ul = document.createElement("ul");
+    Array.prototype.slice.call(document.querySelectorAll(".trex-reference-list li")).forEach(function (li) {
+      var a = li.querySelector("a");
+      if (onCran && a.hasAttribute("data-installed-only")) return;
+      var item = document.createElement("li");
+      item.innerHTML = '<a href="' + a.getAttribute("href") + '">' + a.textContent + '</a>';
+      ul.appendChild(item);
+    });
+    ref.appendChild(ul);
+    pane.appendChild(ref);
+    if (toc) toc.appendChild(pane);
+  }
+
+  /* the search box: page titles and headings of the index, matched as substrings */
+  var box = document.querySelector(".trex-search input");
+  var results = document.querySelector(".trex-search-results");
+  if (box && results && typeof trexSearchIndex !== "undefined") {
+    var addHit = function (href, page, text) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = href;
+      var tag = document.createElement("span");
+      tag.className = "page";
+      tag.textContent = page === 0 ? "Overview" : "Page " + page;
+      a.appendChild(tag);
+      a.appendChild(document.createTextNode(text));
+      li.appendChild(a);
+      results.appendChild(li);
+    };
+    var search = function () {
+      var q = box.value.trim().toLowerCase();
+      results.innerHTML = "";
+      if (q.length < 2) { results.hidden = true; return; }
+      var count = 0;
+      trexSearchIndex.forEach(function (pg) {
+        if (count < 40 && pg.t.toLowerCase().indexOf(q) >= 0) { addHit(pg.p, pg.n, pg.t); count++; }
+        pg.h.forEach(function (h) {
+          if (count < 40 && h[0].toLowerCase().indexOf(q) >= 0) { addHit(pg.p + "#" + h[1], pg.n, h[0]); count++; }
+        });
+      });
+      if (count === 0) {
+        var none = document.createElement("li");
+        none.className = "none";
+        none.textContent = "No heading matches";
+        results.appendChild(none);
+      }
+      results.hidden = false;
+    };
+    box.addEventListener("input", search);
+    box.addEventListener("focus", search);
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { box.value = ""; results.hidden = true; box.blur(); }
+    });
+    document.addEventListener("click", function (e) {
+      if (!box.parentNode.contains(e.target)) results.hidden = true;
+    });
+  }
+
+  /* previous and next at the end of the page; page 1 leads back to the overview,
+     the overview leads to page 1 */
+  var pager = document.createElement("nav");
+  pager.className = "trex-pager";
+  if (cur > 0) {
+    var prev = pages[cur - 1];
+    pager.innerHTML += '<a class="prev" href="' + prev.href + '">&larr; ' + prev.n + '. ' + prev.title + '</a>';
+  } else if (cur === 0) {
+    pager.innerHTML += '<a class="prev" href="' + home.href + '">&larr; ' + home.title + '</a>';
+  }
+  if (cur >= 0) pager.innerHTML += '<span class="where">' + (cur + 1) + ' / ' + pages.length + '</span>';
+  if (cur >= 0 && cur < pages.length - 1) {
+    var next = pages[cur + 1];
+    pager.innerHTML += '<a class="next" href="' + next.href + '">' + next.n + '. ' + next.title + ' &rarr;</a>';
+  } else if (atHome) {
+    var first = pages[0];
+    pager.innerHTML += '<a class="next" href="' + first.href + '">' + first.n + '. ' + first.title + ' &rarr;</a>';
+  }
+  document.body.appendChild(pager);
+
+  /* the copyright line under the pager */
+  var foot = document.createElement("footer");
+  foot.className = "trex-footer";
+  foot.textContent = "Copyright © 2026 Team T-Rex";
+  document.body.appendChild(foot);
+
+  /* the table of contents follows the scroll */
+  var links = Array.prototype.slice.call(document.querySelectorAll("#TOC a[href^='#']"));
+  var heads = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+  function follow() {
+    var active = -1;
+    heads.forEach(function (h, i) { if (h && h.getBoundingClientRect().top <= 90) active = i; });
+    links.forEach(function (a, i) { a.classList.toggle("active", i === active); });
+  }
+  window.addEventListener("scroll", follow);
+  follow();
+});
+</script>
+
+
+<h1 class="title toc-ignore">T-Rex GVS: grouped variable selection</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#groups-of-correlated-variables" id="toc-groups-of-correlated-variables">Groups of correlated
+variables</a></li>
+<li><a href="#data-with-groups" id="toc-data-with-groups">Data with
+groups</a></li>
+<li><a href="#the-elastic-net-policy" id="toc-the-elastic-net-policy">The elastic net policy</a></li>
+<li><a href="#choosing-lambda_2" id="toc-choosing-lambda_2">Choosing
+lambda_2</a></li>
+<li><a href="#the-informed-elastic-net" id="toc-the-informed-elastic-net">The informed elastic net</a></li>
+<li><a href="#examples" id="toc-examples">Examples</a></li>
+<li><a href="#bibliography" id="toc-bibliography">Bibliography</a></li>
+</ul>
+</div>
+
+<div id="groups-of-correlated-variables" class="section level1">
+<h1>Groups of correlated variables</h1>
+<p>In genomics and finance, variables come in groups of highly
+correlated members that carry the same signal. The lasso picks one
+member of a group and drops the others, while the elastic net <span class="citation"><a href="#ref-zou2005elasticnet">[1]</a></span> spreads
+the coefficient over the group and lets the members enter together. The
+T-Rex selector for grouped variable selection (GVS) <span class="citation"><a href="#ref-machkour2022gvs">[2]</a></span> runs the
+terminating elastic net (T-ENET) inside the random experiments and draws
+its dummies in groups too, so that the dummies mirror the group
+structure of the null variables. The informed elastic net (IEN) <span class="citation"><a href="#ref-machkour2023ien">[3]</a></span> goes one
+step further and encodes the known or estimated groups in the penalty,
+so that the members of a group share a coefficient.</p>
+</div>
+<div id="data-with-groups" class="section level1">
+<h1>Data with groups</h1>
+<p>Twenty groups of five variables, each group driven by one latent
+factor. The first two groups are active.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">11</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>group_size <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>groups <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(p <span class="sc">/</span> group_size), <span class="at">each =</span> group_size)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>latent <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> <span class="fu">max</span>(groups)), n, <span class="fu">max</span>(groups))</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fl">0.9</span> <span class="sc">*</span> latent[, groups] <span class="sc">+</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="fl">0.9</span><span class="sc">^</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>true_support <span class="ot">&lt;-</span> <span class="fu">which</span>(groups <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">numeric</span>(p)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>beta[true_support] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span></code></pre></div>
+</div>
+<div id="the-elastic-net-policy" class="section level1">
+<h1>The elastic net policy</h1>
+<p><code>gvs_type = &quot;EN&quot;</code> is the default. The selector clusters
+the variables by correlation (single linkage, cut at
+<code>corr_max</code>), draws its dummies per cluster and runs the
+T-ENET solver chosen by <code>en_solver</code> (<code>&quot;TENET&quot;</code> by
+default, <code>&quot;TENET_AUG&quot;</code> the row-augmented form and
+<code>&quot;TCDENET&quot;</code> the coordinate descent form, which select the
+same variables). The elastic-net penalty <span class="math inline">\(\lambda_2\)</span> is fixed here.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>gvs <span class="ot">&lt;-</span> TRexGVSSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">5</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                           <span class="at">gvs_control =</span> <span class="fu">trex_gvs_control</span>(<span class="at">gvs_type =</span> <span class="st">&quot;EN&quot;</span>, <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>gvs<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">sort</span>(gvs<span class="sc">$</span>selected_indices)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;  [1]  1  2  3  4  5  6  7  8  9 10</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">trex_fdp</span>(gvs<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">trex_tpp</span>(gvs<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<p>The fields record the clustering and the penalty.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>gvs<span class="sc">$</span>gvs_type</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;EN&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>gvs<span class="sc">$</span>max_clusters</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; [1] 20</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>gvs<span class="sc">$</span>hc_method_used</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;single&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>gvs<span class="sc">$</span>lambda2_used</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">table</span>(gvs<span class="sc">$</span>groups)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 1 2 3 4 5 </span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; 5 5 5 5 5</span></span></code></pre></div>
+</div>
+<div id="choosing-lambda_2" class="section level1">
+<h1>Choosing lambda_2</h1>
+<p>A negative <code>lambda_2</code> (the default <code>-1</code>) lets
+the selector determine the penalty. <code>lambda2_method</code> names
+the rule. For the elastic net the default is <code>&quot;CV_1SE_CCD&quot;</code>,
+a ridge cross-validation by coordinate descent read with the
+one-standard-error rule, with <code>&quot;CV_MIN_CCD&quot;</code>,
+<code>&quot;CV_1SE_SVD&quot;</code> and <code>&quot;CV_MIN_SVD&quot;</code> as alternatives.
+The one-standard-error rule is preferred because the minimum rule tends
+to pin the penalty to the floor of the grid. <code>cv_n_folds</code>,
+<code>cv_n_lambda</code> and <code>cv_seed</code> control the
+cross-validation. <code>lambda2_cv_diagnostics</code> is the health
+record of the tuner: whether it ran, its seconds, and
+<code>n_profile_at_edge</code>, the number of <span class="math inline">\(\lambda_2\)</span> values whose profiled <span class="math inline">\(\lambda_1\)</span> optimum sat on a truncation
+edge of the path (0 is healthy).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cv <span class="ot">&lt;-</span> TRexGVSSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">5</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                          <span class="at">gvs_control =</span> <span class="fu">trex_gvs_control</span>(<span class="at">gvs_type =</span> <span class="st">&quot;EN&quot;</span>, <span class="at">cv_n_lambda =</span> <span class="dv">100</span>),</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                          <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>cv<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>cv<span class="sc">$</span>lambda2_used</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; [1] 100.2816</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">str</span>(cv<span class="sc">$</span>lambda2_cv_diagnostics)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; List of 12</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;  $ ran                   : logi TRUE</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;  $ seconds               : num 0.0717</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;  $ n_profile_at_edge     : int 0</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt;  $ support_cap           : int -1</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt;  $ dfmax_ratio           : num 0</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt;  $ low_dimensional       : logi FALSE</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;  $ grid_index            : int 83</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt;  $ grid_size             : int 100</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt;  $ at_grid_edge          : logi FALSE</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt;  $ profile_at_edge       : logi FALSE</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;  $ profile_at_support_cap: logi FALSE</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;  $ boundary_pick         : logi FALSE</span></span></code></pre></div>
+</div>
+<div id="the-informed-elastic-net" class="section level1">
+<h1>The informed elastic net</h1>
+<p><code>gvs_type = &quot;IEN&quot;</code> encodes the groups in the penalty. The
+groups come from <code>groups</code> in the control (1-based labels of
+length <span class="math inline">\(p\)</span>) or from the correlation
+clustering. The solver is set in <code>trex_control(solver = )</code>:
+<code>&quot;TIENET&quot;</code> (default, the native pathwise form),
+<code>&quot;TIENET_AUG&quot;</code> (row augmented) or <code>&quot;TCDIENET&quot;</code>
+(coordinate descent). The IEN rules of <code>lambda2_method</code>
+(<code>&quot;CV_1SE_IEN_CCD&quot;</code>, the default on this track,
+<code>&quot;CV_MIN_IEN_CCD&quot;</code>, <code>&quot;CV_1SE_TIK_SVD&quot;</code>,
+<code>&quot;CV_MIN_TIK_SVD&quot;</code>) consume the group structure and return
+<span class="math inline">\(\lambda_2\)</span> on the solver scale.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>ien <span class="ot">&lt;-</span> TRexGVSSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">5</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                           <span class="at">gvs_control =</span> <span class="fu">trex_gvs_control</span>(<span class="at">gvs_type =</span> <span class="st">&quot;IEN&quot;</span>, <span class="at">groups =</span> groups,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                                                          <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                           <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">solver =</span> <span class="st">&quot;TIENET&quot;</span>, <span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>ien<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="fu">sort</span>(ien<span class="sc">$</span>selected_indices)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1]  1  2  4  5  6  7 10</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">trex_fdp</span>(ien<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">trex_tpp</span>(ien<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span></code></pre></div>
+<p>With the groups known and the penalty informed, the active groups
+enter complete.</p>
+</div>
+<div id="examples" class="section level1">
+<h1>Examples</h1>
+<p>The <a href="https://github.com/trexselector/TRexSelector_Examples/tree/main">TRexSelector_Examples</a>
+repository holds runnable demos and Monte Carlo studies of T-Rex GVS on
+block designs of several kinds, with their results and a README per
+demo, in <a href="https://github.com/trexselector/TRexSelector_Examples/tree/main/R/trex_selector_methods/ad/trex_gvs">R</a>,
+<a href="https://github.com/trexselector/TRexSelector_Examples/tree/main/Python/trex_selector_methods/ad/trex_gvs">Python</a>
+and <a href="https://github.com/trexselector/TRexSelector_Examples/tree/main/cpp/trex_selector_methods/ad/trex_gvs">C++</a>.</p>
+</div>
+<div id="bibliography" class="section level1 unnumbered">
+<h1 class="unnumbered">Bibliography</h1>
+<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="ref-zou2005elasticnet" class="csl-entry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">H.
+Zou and T. Hastie, <span>“Regularization and variable selection via the
+elastic net,”</span> <em>J. R. Stat. Soc. Ser. B Stat. Methodol.</em>,
+vol. 67, no. 2, pp. 301–320, 2005, doi: <a href="https://doi.org/10.1111/j.1467-9868.2005.00503.x">10.1111/j.1467-9868.2005.00503.x</a>.</div>
+</div>
+<div id="ref-machkour2022gvs" class="csl-entry">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“False discovery rate
+control for grouped variable selection in high-dimensional linear models
+using the <span>T-Knock</span> filter,”</span> in <em>Proc. 30th eur.
+Signal process. Conf. (EUSIPCO)</em>, 2022, pp. 892–896. doi: <a href="https://doi.org/10.23919/EUSIPCO55093.2022.9909883">10.23919/EUSIPCO55093.2022.9909883</a>.</div>
+</div>
+<div id="ref-machkour2023ien" class="csl-entry">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">J.
+Machkour, M. Muma, and D. P. Palomar, <span>“The informed elastic net
+for fast grouped variable selection and <span>FDR</span> control in
+genomics research,”</span> in <em>Proc. IEEE 9th int. Workshop comput.
+Adv. Multi-sensor adapt. Process. (CAMSAP)</em>, 2023, pp. 466–470. doi:
+<a href="https://doi.org/10.1109/CAMSAP58249.2023.10403489">10.1109/CAMSAP58249.2023.10403489</a>.</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

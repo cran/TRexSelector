@@ -1,3 +1,27 @@
+# TRexSelector 2.0.1
+
+A patch release. CRAN's daily checks of 2.0.0 reported "Installation failed" on the macOS builders for
+R-release (x86_64) and R-oldrel (arm64 and x86_64), which compile with Apple clang 14.0.3. That compiler
+accepts C++20 but its standard library has no ranges algorithms, and the backend used `std::ranges::find`
+and `std::ranges::sort` at three places. The three calls are `std::find` and `std::sort` now, with identical
+results.
+
+On Linux with R 4.6 or R-devel the package compiled without OpenMP, because `R CMD config` no longer serves
+`SHLIB_OPENMP_CXXFLAGS` there. The configure script reads the flags from R's Makeconf instead, so those builds
+run their parallel regions again. The README is reorganised. It opens with a description of the method, gives
+an overview of the selectors, T-solvers, ML methods and utilities, and installs from CRAN first, as the
+getting-started vignette does. A new vignette, "Data dimensionality and FDR control", follows the getting-started
+vignette with the three regimes of the number of variables against the number of observations in one map,
+and an overview vignette, `vignette("TRexSelector")`, introduces the package and lists the pages. The
+overview and the thirteen pages share a stylesheet and a navigation header, with a table of contents on
+the left that follows the scroll, the list of pages under it, and previous/next links with the copyright
+line at the end of every page, a search box over the titles and headings of the pages in the top bar,
+and they follow a dark system appearance. Four pages carry figures (the T-Rex framework and a design with
+dummies, the regime map, the memory model), five draw their results with ggplot2, and the method pages link
+the demos of the Examples repository. The package title reads "T-Rex Selector: High-Dimensional Variable
+Selection and FDR Control", and the package entry of `citation("TRexSelector")` names Team T-Rex as its
+author. Nothing else changes.
+
 # TRexSelector 2.0.0
 
 The package is rewritten as R bindings to the TRexSelector C++ library. The pure-R implementation of

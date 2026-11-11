@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>T-Rex Tikhonov: a general penalty matrix</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}
+</style>
+
+<style type="text/css">
+body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 760px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 15px;
+line-height: 1.45;
+color: #24292e;
+}
+
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 6px 8px;
+width: 400px;
+border: 1px solid #d0d7de;
+border-radius: 5px;
+background-color: #f6f8fa;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+color: #336C68;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 18px;
+list-style: none;
+}
+
+#TOC a {
+color: #24292e;
+text-decoration: none;
+}
+#TOC a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+@media (min-width: 1100px) {
+body {
+margin-left: 300px;
+margin-right: auto;
+}
+#TOC {
+position: fixed;
+top: 0;
+left: 0;
+bottom: 0;
+width: 240px;
+margin: 0;
+padding: 16px 12px;
+overflow-y: auto;
+border: none;
+border-right: 1px solid #d0d7de;
+border-radius: 0;
+}
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f8fa;
+border-left: 4px solid #d0d7de;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+
+pre, code {
+background-color: #f6f8fa;
+border-radius: 4px;
+color: #24292e;
+white-space: pre-wrap; 
+}
+pre {
+border: 1px solid #d0d7de;
+margin: 8px 0px 14px 0px;
+padding: 10px 12px;
+font-size: 13px;
+line-height: 1.4;
+}
+pre:not([class]) {
+background-color: #f6f8fa;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 87%;
+}
+p > code, li > code, td > code {
+padding: 2px 4px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #CCCCCC;
+border-radius: 3px;
+margin: 0 5px;
+}
+h1 {
+margin-top: 44px;
+font-size: 35px;
+line-height: 40px;
+}
+h1.title {
+margin-top: 0;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+margin-top: 32px;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+margin-top: 26px;
+padding-top: 10px;
+font-size: 120%;
+}
+
+div.section p,
+div.section li,
+body > p,
+body > blockquote p,
+body > ol > li,
+body > ul > li {
+text-align: justify;
+hyphens: auto;
+-webkit-hyphens: auto;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+body {
+padding-top: 48px;
+}
+.trex-topbar {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+z-index: 10;
+display: flex;
+align-items: center;
+min-height: 40px;
+padding: 0 16px;
+background: #2C3E50;
+color: #ecf0f1;
+font-size: 13px;
+}
+.trex-topbar .brand,
+.trex-topbar .brand:visited {
+font-weight: bold;
+font-size: 16px;
+color: #fff;
+margin-right: 12px;
+text-decoration: none;
+}
+.trex-topbar .brand:hover {
+color: #18BC9C;
+}
+.trex-topbar .sub {
+color: #bdc3c7;
+}
+.trex-topbar .where {
+margin-left: auto;
+color: #6BB2AD;
+font-weight: bold;
+}
+
+.trex-search {
+position: relative;
+margin: 0 0 0 24px;
+flex: 0 1 240px;
+min-width: 120px;
+}
+.trex-search input {
+width: 100%;
+box-sizing: border-box;
+padding: 4px 8px;
+border: 1px solid #4a5d70;
+border-radius: 4px;
+background: #3d5166;
+color: #fff;
+font-size: 13px;
+}
+.trex-search input::placeholder {
+color: #aab4be;
+}
+.trex-search input:focus {
+outline: none;
+border-color: #6BB2AD;
+}
+.trex-search-results {
+position: absolute;
+top: 30px;
+left: 0;
+width: 380px;
+max-width: 90vw;
+max-height: 60vh;
+overflow-y: auto;
+margin: 0;
+padding: 4px 0;
+list-style: none;
+background: #fff;
+border: 1px solid #d0d7de;
+border-radius: 4px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+z-index: 20;
+}
+.trex-search-results li {
+list-style: none;
+margin: 0;
+}
+.trex-search-results a {
+display: block;
+padding: 4px 10px;
+color: #24292e;
+text-decoration: none;
+font-size: 13px;
+line-height: 1.35;
+}
+.trex-search-results a:hover {
+background: #f6f8fa;
+color: #24292e;
+}
+.trex-search-results .page {
+display: inline-block;
+min-width: 62px;
+margin-right: 6px;
+color: #336C68;
+font-size: 11px;
+font-weight: bold;
+}
+.trex-search-results .none {
+padding: 4px 10px;
+color: #6a737d;
+font-size: 13px;
+}
+@media (min-width: 1100px) {
+#TOC {
+top: 40px;
+}
+}
+.trex-pane {
+margin-top: 14px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 13px;
+}
+.trex-pane::before {
+content: "User guide";
+display: block;
+font-weight: bold;
+font-size: 15px;
+margin: 0 0 4px 5px;
+color: #57606a;
+}
+.trex-pane ol {
+list-style: none;
+margin: 0;
+padding: 0 0 0 5px;
+}
+.trex-pane a.home {
+margin-left: 5px;
+}
+.trex-pane a.home,
+.trex-pane li a {
+display: block;
+padding: 2px 4px;
+color: #24292e;
+text-decoration: none;
+line-height: 18px;
+}
+.trex-pane a.home:hover,
+.trex-pane li a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+
+.trex-pane a.home.current,
+.trex-pane li.current a {
+font-weight: 600;
+color: #336C68;
+border-left: 4px solid #336C68;
+padding-left: 6px;
+}
+.trex-pane .n::after {
+content: ". ";
+}
+
+.trex-reference {
+margin-top: 14px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 13px;
+}
+.trex-reference::before {
+content: "Reference";
+display: block;
+font-weight: bold;
+font-size: 15px;
+margin: 0 0 4px 5px;
+color: #57606a;
+}
+#TOC .trex-reference ul {
+list-style: none;
+margin: 0;
+padding: 0 0 0 5px;
+}
+#TOC .trex-reference li a {
+display: block;
+padding: 2px 4px;
+color: #24292e;
+text-decoration: none;
+line-height: 18px;
+}
+#TOC .trex-reference li a:hover {
+color: #336C68;
+text-decoration: underline;
+}
+
+.trex-pager {
+display: grid;
+grid-template-columns: 1fr auto 1fr;
+column-gap: 16px;
+align-items: center;
+margin-top: 36px;
+padding-top: 10px;
+border-top: 1px solid #d0d7de;
+font-size: 14px;
+}
+.trex-pager a {
+color: #336C68;
+}
+.trex-pager .prev {
+grid-column: 1;
+}
+.trex-pager .where {
+grid-column: 2;
+color: #6a737d;
+font-size: 12px;
+}
+.trex-pager .next {
+grid-column: 3;
+text-align: right;
+}
+.trex-footer {
+margin-top: 28px;
+padding: 10px 0 4px;
+border-top: 1px solid #d0d7de;
+color: #6a737d;
+font-size: 12px;
+text-align: center;
+}
+#TOC a.active {
+font-weight: bold;
+color: #336C68;
+}
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+
+@media (prefers-color-scheme: dark) {
+:root {
+color-scheme: dark;
+}
+body {
+background-color: #0d1117;
+color: #d0d7de;
+}
+#TOC {
+background-color: #161b22;
+border-color: #30363d;
+}
+#TOC a, .trex-pane a.home, .trex-pane li a, #TOC .trex-reference li a {
+color: #d0d7de;
+}
+#TOC .toctitle, .trex-pane::before, .trex-reference::before {
+color: #8b949e;
+}
+.trex-pager a, #TOC a.active, .trex-pane a.home.current, .trex-pane li.current a {
+color: #6BB2AD;
+}
+.trex-pane a.home.current, .trex-pane li.current a {
+border-left-color: #6BB2AD;
+}
+#TOC a:hover, .trex-pane a.home:hover, .trex-pane li a:hover, #TOC .trex-reference li a:hover {
+color: #8cc8c4;
+}
+.trex-search-results {
+background: #161b22;
+border-color: #30363d;
+}
+.trex-search-results a {
+color: #d0d7de;
+}
+.trex-search-results a:hover {
+background: #1f2a29;
+color: #d0d7de;
+}
+.trex-pane, .trex-reference, .trex-pager, .trex-footer {
+border-top-color: #30363d;
+}
+.trex-pager .where, .trex-footer {
+color: #8b949e;
+}
+h2 {
+border-bottom-color: #21262d;
+}
+h3, h4 {
+border-bottom-color: #21262d;
+}
+h5, h6 {
+border-bottom-color: #30363d;
+}
+a {
+color: #58a6ff;
+}
+a:hover {
+color: #79c0ff;
+}
+a:visited {
+color: #bc8cff;
+}
+a:visited:hover {
+color: #d2a8ff;
+}
+table {
+border-color: #30363d;
+}
+table thead, table tr.even {
+background-color: #161b22;
+}
+blockquote {
+background-color: #161b22;
+border-left-color: #30363d;
+}
+hr {
+border-top-color: #484f58;
+}
+pre, code, pre:not([class]) {
+background-color: #161b22;
+color: #d0d7de;
+}
+pre {
+border-color: #30363d;
+}
+img {
+border-color: #30363d;
+}
+
+pre code span.kw, pre code span.cf, pre code span.im { color: #6ab825; font-weight: bold; }
+pre code span.dt { color: #6ab825; }
+pre code span.dv, pre code span.bn, pre code span.fl { color: #6fa8dc; }
+pre code span.st, pre code span.ch, pre code span.vs, pre code span.ss, pre code span.sc { color: #ed9d13; }
+pre code span.co, pre code span.do, pre code span.an, pre code span.cv, pre code span.in {
+color: #9a9a9a;
+font-style: italic;
+}
+pre code span.ot, pre code span.op, pre code span.at { color: #d0d7de; }
+pre code span.fu, pre code span.bu { color: #5e9bea; }
+pre code span.va, pre code span.cn { color: #79c0ff; }
+pre code span.al, pre code span.er { color: #ff6b6b; background-color: transparent; }
+}
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<!-- Shared header of the vignettes, included before the body of every page. The
+     page list below feeds the "User guide" block of the left table of contents, the
+     position in the top bar and the previous/next links at the end of the page.
+     A new vignette is one more list entry. The overview vignette, named after the
+     package, stands above the numbered pages and is linked from the brand. The
+     reference list feeds the "Reference" block under the pages. The search box of
+     the top bar reads the index between the two marker lines, which
+     tools/build_vignette_search_index.R writes from the page titles and headings. -->
+<header class="trex-topbar">
+  <a class="brand" href="TRexSelector.html">TRexSelector</a>
+  <span class="sub">R package guide</span>
+  <form class="trex-search" role="search" onsubmit="return false;">
+    <input type="search" placeholder="Search the guide" aria-label="Search the guide" autocomplete="off">
+    <ul class="trex-search-results" hidden></ul>
+  </form>
+  <span class="where"></span>
+</header>
+<a class="trex-pages-home" href="TRexSelector.html" hidden>Overview</a>
+<ol class="trex-pages-list" hidden>
+  <li><a href="v01-getting-started.html">Getting started</a></li>
+  <li><a href="v02-dimensionality.html">Dimensionality and FDR</a></li>
+  <li><a href="v03-trex-selector.html">The T-Rex selector</a></li>
+  <li><a href="v04-trex-da.html">T-Rex+DA</a></li>
+  <li><a href="v05-trex-gvs.html">T-Rex GVS</a></li>
+  <li><a href="v06-screening.html">Screen-T-Rex</a></li>
+  <li><a href="v07-trex-spca.html">T-Rex SPCA</a></li>
+  <li><a href="v08-trex-tikhonov.html">T-Rex Tikhonov</a></li>
+  <li><a href="v09-tsolvers.html">The T-solvers</a></li>
+  <li><a href="v10-ml-methods.html">The ML methods</a></li>
+  <li><a href="v11-memory-mapping.html">Memory mapping</a></li>
+  <li><a href="v12-no-copies.html">Without data copies</a></li>
+  <li><a href="v13-parallelism.html">Parallelism</a></li>
+</ol>
+<ul class="trex-reference-list" hidden>
+  <li><a href="https://CRAN.R-project.org/package=TRexSelector/TRexSelector.pdf">Reference manual (PDF)</a></li>
+  <li><a href="../html/00Index.html" data-installed-only>Help pages</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/tree/main/R/TRexSelector">Sources on GitHub</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/blob/main/OPENMP.md">OpenMP on your platform</a></li>
+  <li><a href="https://github.com/trexselector/TRexSelector/blob/main/PUBLICATIONS.md">T-Rex publications</a></li>
+</ul>
+<nav class="trex-pane" aria-label="Vignettes"></nav>
+<!-- search index begin -->
+<script>
+var trexSearchIndex = [
+  {p:"TRexSelector.html",n:0,t:"The TRexSelector R package",h:[
+    ["User guide","user-guide"],
+    ["Reference","reference"],
+    ["Links","links"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v01-getting-started.html",n:1,t:"Getting started with TRexSelector",h:[
+    ["What the package does","what-the-package-does"],
+    ["Installation","installation"],
+    ["A first run","a-first-run"],
+    ["The result fields","the-result-fields"],
+    ["T-Rex variants of the library","t-rex-variants-of-the-library"],
+    ["Citing the package","citing-the-package"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v02-dimensionality.html",n:2,t:"Data dimensionality and FDR control",h:[
+    ["The variable selection problem","the-variable-selection-problem"],
+    ["FDR and TPR","fdr-and-tpr"],
+    ["Three regimes","three-regimes"],
+    ["Low dimensionality, $n \\geq p$","low-dimensionality-n-geq-p"],
+    ["High dimensionality, $p > n$","high-dimensionality-p-n"],
+    ["Highest dimensionality, $p \\gg n$","highest-dimensionality-p-gg-n"],
+    ["The regimes in one map","the-regimes-in-one-map"],
+    ["The T-Rex selector across the regimes","the-t-rex-selector-across-the-regimes"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v03-trex-selector.html",n:3,t:"The T-Rex selector",h:[
+    ["FDR and TPR","fdr-and-tpr"],
+    ["The framework","the-framework"],
+    ["Running the selector","running-the-selector"],
+    ["Seeds","seeds"],
+    ["The number of random experiments","the-number-of-random-experiments"],
+    ["Early stopping of the T-loop","early-stopping-of-the-t-loop"],
+    ["The result fields","the-result-fields"],
+    ["The L-loop strategies","the-l-loop-strategies"],
+    ["Dummy distributions","dummy-distributions"],
+    ["Scaling modes","scaling-modes"],
+    ["The design is used in place","the-design-is-used-in-place"],
+    ["FDR control in a small simulation","fdr-control-in-a-small-simulation"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v04-trex-da.html",n:4,t:"T-Rex+DA: dependency-aware dummies",h:[
+    ["Why dependent variables need their own dummies","why-dependent-variables-need-their-own-dummies"],
+    ["An autoregressive design","an-autoregressive-design"],
+    ["The dependency methods","the-dependency-methods"],
+    ["Prior groups","prior-groups"],
+    ["Greedy solvers under T-Rex+DA","greedy-solvers-under-t-rexda"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v05-trex-gvs.html",n:5,t:"T-Rex GVS: grouped variable selection",h:[
+    ["Groups of correlated variables","groups-of-correlated-variables"],
+    ["Data with groups","data-with-groups"],
+    ["The elastic net policy","the-elastic-net-policy"],
+    ["Choosing lambda_2","choosing-lambda_2"],
+    ["The informed elastic net","the-informed-elastic-net"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v06-screening.html",n:6,t:"Screening: Screen-T-Rex and the biobank screening",h:[
+    ["Screening before selecting","screening-before-selecting"],
+    ["Screen-T-Rex","screen-t-rex"],
+    ["A bootstrap confidence interval","a-bootstrap-confidence-interval"],
+    ["Dependent variables","dependent-variables"],
+    ["The biobank screening","the-biobank-screening"],
+    ["Large designs","large-designs"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v07-trex-spca.html",n:7,t:"T-Rex SPCA: sparse principal components under FDR control",h:[
+    ["Sparse loadings with a guarantee","sparse-loadings-with-a-guarantee"],
+    ["Data with two sparse factors","data-with-two-sparse-factors"],
+    ["Running the selector","running-the-selector"],
+    ["The control","the-control"],
+    ["Memory-mapped data","memory-mapped-data"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v08-trex-tikhonov.html",n:8,t:"T-Rex Tikhonov: a general penalty matrix",h:[
+    ["From the elastic net to a penalty matrix","from-the-elastic-net-to-a-penalty-matrix"],
+    ["A smooth coefficient profile","a-smooth-coefficient-profile"],
+    ["Running the selector","running-the-selector"],
+    ["Choosing lambda_2","choosing-lambda_2"],
+    ["Dummies for a structured penalty","dummies-for-a-structured-penalty"],
+    ["Group centering","group-centering"],
+    ["The solver","the-solver"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v09-tsolvers.html",n:9,t:"The T-solvers",h:[
+    ["Terminating forward selection","terminating-forward-selection"],
+    ["One terminated path","one-terminated-path"],
+    ["The path as a picture","the-path-as-a-picture"],
+    ["The options","the-options"],
+    ["Writers and readers","writers-and-readers"],
+    ["Saving and loading","saving-and-loading"],
+    ["Memory","memory"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v10-ml-methods.html",n:10,t:"The ML methods",h:[
+    ["The building blocks","the-building-blocks"],
+    ["Scalers","scalers"],
+    ["Ridge regression","ridge-regression"],
+    ["The elastic net","the-elastic-net"],
+    ["SVD and PCA","svd-and-pca"],
+    ["Hierarchical clustering","hierarchical-clustering"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v11-memory-mapping.html",n:11,t:"Memory mapping: disk-backed designs",h:[
+    ["A design larger than the memory","a-design-larger-than-the-memory"],
+    ["Creating and opening a mapped matrix","creating-and-opening-a-mapped-matrix"],
+    ["Streaming a design into the file","streaming-a-design-into-the-file"],
+    ["Selectors on a mapped design","selectors-on-a-mapped-design"],
+    ["T-solvers and ML methods","t-solvers-and-ml-methods"],
+    ["When it pays","when-it-pays"],
+    ["Examples","examples"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v12-no-copies.html",n:12,t:"Working without data copies",h:[
+    ["The rule","the-rule"],
+    ["Pass double matrices","pass-double-matrices"],
+    ["Selectors: in place at construction, back at the end","selectors-in-place-at-construction-back-at-the-end"],
+    ["T-solvers: writers and readers","t-solvers-writers-and-readers"],
+    ["Loading a saved solver","loading-a-saved-solver"],
+    ["Mapped files are never read into memory","mapped-files-are-never-read-into-memory"],
+    ["The low-memory engines","the-low-memory-engines"],
+    ["Measuring the footprint","measuring-the-footprint"],
+    ["Bibliography","bibliography"]
+  ]},
+  {p:"v13-parallelism.html",n:13,t:"Parallelism: who owns the cores",h:[
+    ["Two layers of work","two-layers-of-work"],
+    ["The default thread budget of the package","the-default-thread-budget-of-the-package"],
+    ["The solvers' passes","the-solvers-passes"],
+    ["Parallel random experiments","parallel-random-experiments"],
+    ["Determinism","determinism"],
+    ["Combining with your own parallel loops","combining-with-your-own-parallel-loops"],
+    ["Builds without OpenMP","builds-without-openmp"],
+    ["The CRAN rule","the-cran-rule"],
+    ["Bibliography","bibliography"]
+  ]}
+];
+</script>
+<!-- search index end -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.documentElement.lang = "en"; // hyphenation of the justified text needs a language
+  var here = location.pathname.split("/").pop();
+  var items = Array.prototype.slice.call(document.querySelectorAll(".trex-pages-list li"));
+  var pages = items.map(function (li, i) {
+    var a = li.querySelector("a");
+    return { n: i + 1, href: a.getAttribute("href"), title: a.textContent };
+  });
+  var cur = -1;
+  pages.forEach(function (p, i) { if (p.href === here) cur = i; });
+  var homeEl = document.querySelector(".trex-pages-home");
+  var home = { href: homeEl.getAttribute("href"), title: homeEl.textContent };
+  var atHome = home.href === here;
+
+  /* the position in the top bar */
+  var where = document.querySelector(".trex-topbar .where");
+  if (where && cur >= 0) where.textContent = "Page " + (cur + 1) + " of " + pages.length;
+
+  /* the overview and the page list in the left table of contents */
+  var pane = document.querySelector(".trex-pane");
+  var toc = document.getElementById("TOC");
+  if (pane) {
+    var hl = document.createElement("a");
+    hl.className = "home" + (atHome ? " current" : "");
+    hl.href = home.href;
+    hl.textContent = home.title;
+    pane.appendChild(hl);
+    var ol = document.createElement("ol");
+    pages.forEach(function (p, i) {
+      var li = document.createElement("li");
+      if (i === cur) li.className = "current";
+      li.innerHTML = '<a href="' + p.href + '"><span class="n">' + p.n + '</span>' + p.title + '</a>';
+      ol.appendChild(li);
+    });
+    pane.appendChild(ol);
+
+    /* the reference block; the help pages only where an installed package serves them */
+    var onCran = /\/web\/packages\//.test(location.pathname);
+    var ref = document.createElement("div");
+    ref.className = "trex-reference";
+    var ul = document.createElement("ul");
+    Array.prototype.slice.call(document.querySelectorAll(".trex-reference-list li")).forEach(function (li) {
+      var a = li.querySelector("a");
+      if (onCran && a.hasAttribute("data-installed-only")) return;
+      var item = document.createElement("li");
+      item.innerHTML = '<a href="' + a.getAttribute("href") + '">' + a.textContent + '</a>';
+      ul.appendChild(item);
+    });
+    ref.appendChild(ul);
+    pane.appendChild(ref);
+    if (toc) toc.appendChild(pane);
+  }
+
+  /* the search box: page titles and headings of the index, matched as substrings */
+  var box = document.querySelector(".trex-search input");
+  var results = document.querySelector(".trex-search-results");
+  if (box && results && typeof trexSearchIndex !== "undefined") {
+    var addHit = function (href, page, text) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = href;
+      var tag = document.createElement("span");
+      tag.className = "page";
+      tag.textContent = page === 0 ? "Overview" : "Page " + page;
+      a.appendChild(tag);
+      a.appendChild(document.createTextNode(text));
+      li.appendChild(a);
+      results.appendChild(li);
+    };
+    var search = function () {
+      var q = box.value.trim().toLowerCase();
+      results.innerHTML = "";
+      if (q.length < 2) { results.hidden = true; return; }
+      var count = 0;
+      trexSearchIndex.forEach(function (pg) {
+        if (count < 40 && pg.t.toLowerCase().indexOf(q) >= 0) { addHit(pg.p, pg.n, pg.t); count++; }
+        pg.h.forEach(function (h) {
+          if (count < 40 && h[0].toLowerCase().indexOf(q) >= 0) { addHit(pg.p + "#" + h[1], pg.n, h[0]); count++; }
+        });
+      });
+      if (count === 0) {
+        var none = document.createElement("li");
+        none.className = "none";
+        none.textContent = "No heading matches";
+        results.appendChild(none);
+      }
+      results.hidden = false;
+    };
+    box.addEventListener("input", search);
+    box.addEventListener("focus", search);
+    box.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { box.value = ""; results.hidden = true; box.blur(); }
+    });
+    document.addEventListener("click", function (e) {
+      if (!box.parentNode.contains(e.target)) results.hidden = true;
+    });
+  }
+
+  /* previous and next at the end of the page; page 1 leads back to the overview,
+     the overview leads to page 1 */
+  var pager = document.createElement("nav");
+  pager.className = "trex-pager";
+  if (cur > 0) {
+    var prev = pages[cur - 1];
+    pager.innerHTML += '<a class="prev" href="' + prev.href + '">&larr; ' + prev.n + '. ' + prev.title + '</a>';
+  } else if (cur === 0) {
+    pager.innerHTML += '<a class="prev" href="' + home.href + '">&larr; ' + home.title + '</a>';
+  }
+  if (cur >= 0) pager.innerHTML += '<span class="where">' + (cur + 1) + ' / ' + pages.length + '</span>';
+  if (cur >= 0 && cur < pages.length - 1) {
+    var next = pages[cur + 1];
+    pager.innerHTML += '<a class="next" href="' + next.href + '">' + next.n + '. ' + next.title + ' &rarr;</a>';
+  } else if (atHome) {
+    var first = pages[0];
+    pager.innerHTML += '<a class="next" href="' + first.href + '">' + first.n + '. ' + first.title + ' &rarr;</a>';
+  }
+  document.body.appendChild(pager);
+
+  /* the copyright line under the pager */
+  var foot = document.createElement("footer");
+  foot.className = "trex-footer";
+  foot.textContent = "Copyright © 2026 Team T-Rex";
+  document.body.appendChild(foot);
+
+  /* the table of contents follows the scroll */
+  var links = Array.prototype.slice.call(document.querySelectorAll("#TOC a[href^='#']"));
+  var heads = links.map(function (a) { return document.getElementById(a.getAttribute("href").slice(1)); });
+  function follow() {
+    var active = -1;
+    heads.forEach(function (h, i) { if (h && h.getBoundingClientRect().top <= 90) active = i; });
+    links.forEach(function (a, i) { a.classList.toggle("active", i === active); });
+  }
+  window.addEventListener("scroll", follow);
+  follow();
+});
+</script>
+
+
+<h1 class="title toc-ignore">T-Rex Tikhonov: a general penalty
+matrix</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#from-the-elastic-net-to-a-penalty-matrix" id="toc-from-the-elastic-net-to-a-penalty-matrix">From the elastic net
+to a penalty matrix</a></li>
+<li><a href="#a-smooth-coefficient-profile" id="toc-a-smooth-coefficient-profile">A smooth coefficient
+profile</a></li>
+<li><a href="#running-the-selector" id="toc-running-the-selector">Running the selector</a></li>
+<li><a href="#choosing-lambda_2" id="toc-choosing-lambda_2">Choosing
+lambda_2</a></li>
+<li><a href="#dummies-for-a-structured-penalty" id="toc-dummies-for-a-structured-penalty">Dummies for a structured
+penalty</a></li>
+<li><a href="#group-centering" id="toc-group-centering">Group
+centering</a></li>
+<li><a href="#the-solver" id="toc-the-solver">The solver</a></li>
+<li><a href="#bibliography" id="toc-bibliography">Bibliography</a></li>
+</ul>
+</div>
+
+<div id="from-the-elastic-net-to-a-penalty-matrix" class="section level1">
+<h1>From the elastic net to a penalty matrix</h1>
+<p>The elastic net adds the ridge penalty <span class="math inline">\(\lambda_2 \|\boldsymbol\beta\|_2^2\)</span> to the
+lasso. Tikhonov regularization in general form <span class="citation"><a href="#ref-tikhonov1963regularization">[1]</a>, <a href="#ref-park2018tikhonov">[2]</a></span> replaces it by <span class="math inline">\(\lambda_2 \|\boldsymbol\Gamma
+\boldsymbol\beta\|_2^2 = \lambda_2 \boldsymbol\beta^\top \boldsymbol K
+\boldsymbol\beta\)</span> with <span class="math inline">\(\boldsymbol K
+= \boldsymbol\Gamma^\top \boldsymbol\Gamma\)</span>. The matrix encodes
+what the analyst knows about the coefficients. <span class="math inline">\(\boldsymbol K = \boldsymbol I\)</span> is the
+elastic net, a first-difference operator <span class="math inline">\(\boldsymbol\Gamma\)</span> gives the graph
+Laplacian of a chain and asks neighbouring coefficients to be equal
+(smoothness), a graph Laplacian in general <span class="citation"><a href="#ref-smola2003graphkernels">[3]</a>, <a href="#ref-chung1997spectral">[4]</a></span> couples the variables along
+the edges of a graph, and a block-diagonal centering matrix reproduces
+the penalty of the informed elastic net. The Tikhonov T-Rex selector
+runs the terminating Tikhonov-net solvers (TCDTIKNET by coordinate
+descent, TIKNET by the pathwise algorithm) with such a matrix inside the
+random experiments.</p>
+</div>
+<div id="a-smooth-coefficient-profile" class="section level1">
+<h1>A smooth coefficient profile</h1>
+<p>The active variables are a contiguous block with equal coefficients,
+the case a chain Laplacian is made for.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2718</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">120</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="dv">60</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>true_support <span class="ot">&lt;-</span> <span class="dv">21</span><span class="sc">:</span><span class="dv">30</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">numeric</span>(p)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>beta[true_support] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> p), n, p)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(X <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span></code></pre></div>
+<p><code>trex_gamma_to_k()</code> builds <span class="math inline">\(\boldsymbol K\)</span> from an operator <span class="math inline">\(\boldsymbol\Gamma\)</span> and returns a sparse
+matrix of the Matrix package. A dense base matrix is accepted everywhere
+a penalty matrix is.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">diff</span>(<span class="fu">diag</span>(p))                <span class="co"># first differences, (p - 1) x p</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">requireNamespace</span>(<span class="st">&quot;Matrix&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  K <span class="ot">&lt;-</span> <span class="fu">trex_gamma_to_k</span>(gamma)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="fu">class</span>(K)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  K <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(gamma)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>}</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;dgCMatrix&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;package&quot;)</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Matrix&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>K[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; 4 x 4 sparse Matrix of class &quot;dgCMatrix&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;                 </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; [1,]  1 -1  .  .</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; [2,] -1  2 -1  .</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [3,]  . -1  2 -1</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; [4,]  .  . -1  2</span></span></code></pre></div>
+</div>
+<div id="running-the-selector" class="section level1">
+<h1>Running the selector</h1>
+<p>The Tikhonov control is required, because it carries <span class="math inline">\(\boldsymbol K\)</span>. The penalty weight is
+fixed here.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>tik <span class="ot">&lt;-</span> TRexTikhonovSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">4</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>                                <span class="at">tik_control =</span> <span class="fu">trex_tikhonov_control</span>(<span class="at">tikhonov_K =</span> K, <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>                                <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>tik<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>tik<span class="sc">$</span>selected_indices</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;  [1] 21 22 23 24 25 26 27 28 29 30</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">trex_fdp</span>(tik<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">trex_tpp</span>(tik<span class="sc">$</span>selected_indices, true_support)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>tik<span class="sc">$</span>lambda2_used</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<p><code>TRexTikhonovSelector</code> inherits the fields of
+<code>TRexSelector</code> and adds <code>lambda2_used</code>,
+<code>lambda2_cv_diagnostics</code> and <code>lambda2_pilot</code>.</p>
+</div>
+<div id="choosing-lambda_2" class="section level1">
+<h1>Choosing lambda_2</h1>
+<p><code>lambda_2 &lt; 0</code> (the default) hands the choice to
+<code>lambda2_method</code>. Three rules exist.</p>
+<ul>
+<li><code>&quot;PILOT_KNEE&quot;</code> (the default) reads <span class="math inline">\(\lambda_2\)</span> off a few random experiments
+per candidate of <code>pilot_grid</code>, by the selector’s own
+principle: the smallest <span class="math inline">\(\lambda_2\)</span>
+whose pilot selection count is within <code>pilot_knee_tolerance</code>
+of the largest, the knee of the profile. <code>pilot_K</code>,
+<code>pilot_T</code> and <code>pilot_L_multiplier</code> size the pilot,
+<code>pilot_statistic</code> names the count (<code>&quot;MAJORITY&quot;</code>,
+<code>&quot;CALIBRATED&quot;</code>, <code>&quot;GROUP_MAJORITY&quot;</code>).</li>
+<li>The k-fold cross-validation rules consume <span class="math inline">\(\boldsymbol K\)</span> and return <span class="math inline">\(\lambda_2\)</span> on the solver scale:
+<code>&quot;CV_1SE_IEN_CCD&quot;</code>, <code>&quot;CV_MIN_IEN_CCD&quot;</code>,
+<code>&quot;CV_1SE_TIK_SVD&quot;</code> and <code>&quot;CV_MIN_TIK_SVD&quot;</code>.
+<code>cv_n_folds</code>, <code>cv_n_lambda1</code>,
+<code>cv_n_lambda2</code>, <code>cv_dfmax_ratio</code> and
+<code>cv_seed</code> control them. They judge a fitted estimate, so on
+structured designs they tend to pick the edges of their grid.</li>
+<li><code>trex_tikhonov_lambda2_power_rule()</code> runs one full
+selection per grid value with common dummies and takes the knee of that
+profile. It is the reference rule behind the pilot, at the cost of one
+selection per grid value, and it returns every probe’s selection.</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>pilot <span class="ot">&lt;-</span> TRexTikhonovSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">4</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                                  <span class="at">tik_control =</span> <span class="fu">trex_tikhonov_control</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>                                    <span class="at">tikhonov_K =</span> K,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>                                    <span class="at">pilot_grid =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">10</span>), <span class="at">pilot_K =</span> <span class="dv">4</span>, <span class="at">pilot_T =</span> <span class="dv">2</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>                                  <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>pilot<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>pilot<span class="sc">$</span>lambda2_used</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>pilot<span class="sc">$</span>lambda2_pilot<span class="sc">$</span>grid</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; [1]  0  1 10</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>pilot<span class="sc">$</span>lambda2_pilot<span class="sc">$</span>counts</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; [1] 13 11 10</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>profile <span class="ot">&lt;-</span> <span class="fu">trex_tikhonov_lambda2_power_rule</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">4</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                                            <span class="at">tik_control =</span> <span class="fu">trex_tikhonov_control</span>(<span class="at">tikhonov_K =</span> K),</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                                            <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>), <span class="at">grid =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">10</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>profile<span class="sc">$</span>lambda2</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>profile<span class="sc">$</span>counts</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1] 10 10 10</span></span></code></pre></div>
+</div>
+<div id="dummies-for-a-structured-penalty" class="section level1">
+<h1>Dummies for a structured penalty</h1>
+<p>The false discovery rate (FDR) guarantee needs dummies that are
+exchangeable with the null variables under the penalty. Two defaults
+take care of that. <code>cluster_dummies = TRUE</code> draws the dummies
+as per-cluster coloured layers on a correlation clustering of the
+variables (<code>prior_groups</code>, or hierarchical clustering with
+<code>corr_max</code> and <code>hc_linkage</code>), and
+<code>fold_dummy_coupling = TRUE</code> lets every dummy join the <span class="math inline">\(\boldsymbol K\)</span>-coupling of the variable it
+mirrors (the FOLDED coupling, available with TCDTIKNET). Both switches
+exist for validation runs. With <span class="math inline">\(\boldsymbol
+K = \boldsymbol I\)</span>, independent dummies and the decoupled dummy
+block, the selector reduces to the plain elastic net.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>en <span class="ot">&lt;-</span> TRexTikhonovSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">4</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                               <span class="at">tik_control =</span> <span class="fu">trex_tikhonov_control</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>                                 <span class="at">tikhonov_K =</span> <span class="fu">diag</span>(p), <span class="at">lambda_2 =</span> <span class="dv">1</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>                                 <span class="at">cluster_dummies =</span> <span class="cn">FALSE</span>, <span class="at">fold_dummy_coupling =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>                               <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>en<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>en<span class="sc">$</span>selected_indices</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; [1] 21 23 24 25 26 27 28 30</span></span></code></pre></div>
+</div>
+<div id="group-centering" class="section level1">
+<h1>Group centering</h1>
+<p><code>penalty_structure = &quot;GROUP_CENTERING&quot;</code> lets the selector
+build <span class="math inline">\(\boldsymbol K\)</span> itself as the
+block-diagonal centering penalty <span class="math inline">\(\boldsymbol
+I - \boldsymbol J / p_m\)</span> over the dummy clusters, so the members
+of a group share a coefficient, the penalty of the informed elastic net.
+The groups come from <code>prior_groups</code> or from the clustering.
+An all-singleton partition is legitimate, the penalty vanishes and the
+path is the lasso on per-variable cluster dummies. On this path the
+TCDTIKNET solver runs through the group-centering hooks of TCDIENET, so
+its warnings (sweep budget, certification fallback) carry the tag
+<code>[TCDIENET]</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>groups <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">each =</span> <span class="dv">10</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>gc <span class="ot">&lt;-</span> TRexTikhonovSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">4</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                               <span class="at">tik_control =</span> <span class="fu">trex_tikhonov_control</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>                                 <span class="at">penalty_structure =</span> <span class="st">&quot;GROUP_CENTERING&quot;</span>, <span class="at">prior_groups =</span> groups,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>                                 <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>                               <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>gc<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>gc<span class="sc">$</span>selected_indices</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;  [1] 21 22 23 24 25 26 27 28 29 30</span></span></code></pre></div>
+</div>
+<div id="the-solver" class="section level1">
+<h1>The solver</h1>
+<p><code>trex_control(solver = )</code> picks the Tikhonov-family
+solver: <code>&quot;TCDTIKNET&quot;</code> (default, the neutral
+<code>&quot;TLARS&quot;</code> of <code>trex_control()</code> maps to it) or
+<code>&quot;TIKNET&quot;</code>, the pathwise algorithm. Both solve the same
+problem.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>pw <span class="ot">&lt;-</span> TRexTikhonovSelector<span class="sc">$</span><span class="fu">new</span>(X, y, <span class="at">tFDR =</span> <span class="fl">0.1</span>, <span class="at">seed =</span> <span class="dv">4</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>                               <span class="at">tik_control =</span> <span class="fu">trex_tikhonov_control</span>(<span class="at">tikhonov_K =</span> K, <span class="at">lambda_2 =</span> <span class="dv">1</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                               <span class="at">control =</span> <span class="fu">trex_control</span>(<span class="at">solver =</span> <span class="st">&quot;TIKNET&quot;</span>, <span class="at">K =</span> <span class="dv">10</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>pw<span class="sc">$</span><span class="fu">select</span>()</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>pw<span class="sc">$</span>selected_indices</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;  [1] 21 22 23 24 25 26 27 28 29 30</span></span></code></pre></div>
+</div>
+<div id="bibliography" class="section level1 unnumbered">
+<h1 class="unnumbered">Bibliography</h1>
+<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="ref-tikhonov1963regularization" class="csl-entry">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">A.
+N. Tikhonov, <span>“Solution of incorrectly formulated problems and the
+regularization method,”</span> <em>Soviet Math. Dokl.</em>, vol. 4, pp.
+1035–1038, 1963.</div>
+</div>
+<div id="ref-park2018tikhonov" class="csl-entry">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">Y.
+Park, L. Reichel, G. Rodriguez, and X. Yu, <span>“Parameter
+determination for <span>Tikhonov</span> regularization problems in
+general form,”</span> <em>J. Comput. Appl. Math.</em>, vol. 343, pp.
+12–25, 2018, doi: <a href="https://doi.org/10.1016/j.cam.2018.04.049">10.1016/j.cam.2018.04.049</a>.</div>
+</div>
+<div id="ref-smola2003graphkernels" class="csl-entry">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">A.
+J. Smola and R. Kondor, <span>“Kernels and regularization on
+graphs,”</span> in <em>Learning theory and kernel machines (COLT/kernel
+2003)</em>, 2003, vol. 2777, pp. 144–158. doi: <a href="https://doi.org/10.1007/978-3-540-45167-9_12">10.1007/978-3-540-45167-9_12</a>.</div>
+</div>
+<div id="ref-chung1997spectral" class="csl-entry">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">F.
+R. K. Chung, <em>Spectral graph theory</em>. American Mathematical
+Society, 1997.</div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
